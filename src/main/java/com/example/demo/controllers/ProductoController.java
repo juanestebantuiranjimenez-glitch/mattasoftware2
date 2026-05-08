@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/productos") // Esta será la dirección: localhost:8080/productos
-public class ProductoControllers {
+public class ProductoController {
 
     @Autowired
     private ProductoServices productoService;
