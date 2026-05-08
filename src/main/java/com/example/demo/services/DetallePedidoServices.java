@@ -14,7 +14,7 @@ public class DetallePedidoServices {
     private DetallePedidoRepository detalleRepository;
 
     @Autowired
-    private ProductoRepository productoRepository; // <--- ¡ESTA ES LA LÍNEA QUE TE FALTABA!
+    private ProductoRepository productoRepository; 
 
     public Detalle_Pedido agregarItem(Detalle_Pedido detalle) {
         // 1. Buscamos el producto usando el id_producto
