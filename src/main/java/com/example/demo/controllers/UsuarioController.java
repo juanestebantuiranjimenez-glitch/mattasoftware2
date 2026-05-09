@@ -37,4 +37,18 @@ public class UsuarioController {
             return "usuarios/login";
         }
     }
+
+    // Muestra la página de registro
+    @GetMapping("/registro")
+    public String mostrarRegistro() {
+    return "usuarios/registro";
+}
+    // Guarda al nuevo usuario
+    @PostMapping("/registro")
+    public String guardarRegistro(@ModelAttribute Usuarios usuario) {
+
+         usuarioService.guardarUsuario(usuario);
+
+         return "redirect:/usuarios/login"; // Después de registrarse, lo manda al login
+}
 }
