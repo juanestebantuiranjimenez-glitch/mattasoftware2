@@ -20,6 +20,8 @@ public class UsuarioController {
         return "usuarios/login";
     }
 
+    
+
     // 2. Procesa los datos del formulario
     @PostMapping("/login")
     public String procesarLogin(@RequestParam String correo, 

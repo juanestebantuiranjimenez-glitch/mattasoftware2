@@ -1,5 +1,4 @@
 package com.example.demo.models;
-
 import jakarta.persistence.*;
 
 @Entity 
@@ -17,7 +16,6 @@ public class Usuarios {
     private String tipo_usuario; 
     private String ubicacion;
 
-    
     public Usuarios() {
     }
 
@@ -87,4 +85,6 @@ public class Usuarios {
     public void setUbicacion(String ubicacion) {
         this.ubicacion = ubicacion;
     }
+
+    
 }
