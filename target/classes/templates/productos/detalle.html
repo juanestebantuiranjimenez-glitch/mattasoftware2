@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${producto?.nombre + ' — MATTA'}">Producto — MATTA</title>
+  <link rel="stylesheet" th:href="@{/css/matta.css}"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a th:href="@{/}" class="navbar-logo">🌿 MATTA</a>
+    <div class="navbar-search">
+      <input type="text" id="searchInput" placeholder="Buscar productos…"/>
+      <button onclick="buscar()">🔍</button>
+    </div>
+    <nav class="navbar-nav">
+      <a th:href="@{/productos}" class="nav-link">Productos</a>
+      <th:block th:if="${session.usuario != null}">
+        <a th:href="@{/carrito}" class="nav-carrito">🛒
+          <span class="cart-badge" th:text="${session.cantidadCarrito ?: 0}">0</span>
+        </a>
+        <a th:href="@{/dashboard}" class="nav-link">Mi Panel</a>
+        <a th:href="@{/logout}" class="nav-btn">Salir</a>
+      </th:block>
+      <th:block th:unless="${session.usuario != null}">
+        <a th:href="@{/login}" class="nav-link">Ingresar</a>
+        <a th:href="@{/registro}" class="nav-btn">Registrarse</a>
+      </th:block>
+    </nav>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div style="background: var(--crema); border-bottom: 1px solid var(--borde); padding: 10px 24px;">
+  <div style="max-width:1280px;margin:0 auto;font-size:0.82rem;color:var(--texto-gris);">
+    <a th:href="@{/}" style="color:var(--verde-suave);">Inicio</a>
+    <span style="margin:0 8px;">›</span>
+    <a th:href="@{/productos}" style="color:var(--verde-suave);">Productos</a>
+    <span style="margin:0 8px;">›</span>
+    <span th:text="${producto?.nombre}">Producto</span>
+  </div>
+</div>
+
+<!-- DETALLE -->
+<div class="detalle-layout">
+
+  <!-- Imagen -->
+  <div>
+    <div class="detalle-img-main">
+      <img th:if="${producto?.imagen != null}"
+           th:src="@{'/uploads/' + ${producto.imagen}}"
+           th:alt="${producto.nombre}"/>
+      <span th:unless="${producto?.imagen != null}"
+            th:text="${producto?.icono ?: '🥬'}"
+            style="font-size:7rem;">🥬</span>
+    </div>
+
+    <!-- Info del campesino -->
+    <div style="background:white;border:1.5px solid var(--borde);border-radius:var(--radio);padding:20px;margin-top:16px;">
+      <h4 style="font-size:0.85rem;font-weight:700;color:var(--texto-gris);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:14px;">
+        Vendido por
+      </h4>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div class="campesino-avatar" style="width:48px;height:48px;font-size:1.4rem;">👨‍🌾</div>
+        <div>
+          <div style="font-weight:700;font-size:1rem;" th:text="${producto?.usuario?.nombre ?: 'Campesino'}">Nombre</div>
+          <div style="font-size:0.82rem;color:var(--texto-gris);" th:text="${producto?.usuario?.ubicacion ?: 'Colombia'}">Ubicación</div>
+          <div style="margin-top:6px;">
+            <span class="live-dot"></span>
+            <span style="font-size:0.78rem;color:var(--verde-suave);font-weight:600;">Activo</span>
+          </div>
+        </div>
+      </div>
+      <a th:href="@{/campesinos/{id}(id=${producto?.usuario?.id})}"
+         style="display:block;text-align:center;margin-top:14px;padding:9px;border:1.5px solid var(--borde);border-radius:var(--radio-sm);font-size:0.83rem;font-weight:600;color:var(--verde-oscuro);transition:all 0.2s;">
+        Ver todos sus productos
+      </a>
+    </div>
+  </div>
+
+  <!-- Info del producto -->
+  <div class="detalle-info">
+    <div class="detalle-cat" th:text="${producto?.categoria?.nombre ?: 'Producto'}">Categoría</div>
+    <h1 class="detalle-nombre" th:text="${producto?.nombre}">Nombre del producto</h1>
+
+    <!-- Calificación simple -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+      <span style="color:#f59e0b;font-size:1rem;">★★★★★</span>
+      <span style="font-size:0.82rem;color:var(--texto-gris);">
+        (<span th:text="${producto?.totalCalificaciones ?: 0}">0</span> calificaciones)
+      </span>
+    </div>
+
+    <!-- Precio -->
+    <div class="detalle-precio-bloque">
+      <div class="precio-grande">
+        $<span th:text="${#numbers.formatDecimal(producto?.precio ?: 0, 0,'COMMA',0,'POINT')}">0</span>
+      </div>
+      <div class="precio-unidad" style="margin-top:2px;">
+        por <span th:text="${producto?.unidad ?: 'kg'}">kg</span>
+        · Stock: <strong th:text="${producto?.cantidadDisponible ?: 0}">0</strong>
+        <span th:text="${producto?.unidad ?: 'kg'}">kg</span> disponibles
+      </div>
+    </div>
+
+    <!-- Descripción -->
+    <div style="background:var(--crema);border-radius:var(--radio-sm);padding:14px;margin:16px 0;font-size:0.9rem;line-height:1.7;color:var(--texto-gris);"
+         th:text="${producto?.descripcion ?: 'Producto fresco directo del campo colombiano. Sin intermediarios, con todo el sabor natural.'}">
+      Descripción
+    </div>
+
+    <!-- Cantidad -->
+    <div class="detalle-qty">
+      <span style="font-size:0.88rem;font-weight:600;color:var(--texto-oscuro);">Cantidad:</span>
+      <div class="qty-grande">
+        <button class="qty-btn" onclick="cambiarCantidad(-1)">−</button>
+        <span class="qty-num" id="cantidad">1</span>
+        <button class="qty-btn" onclick="cambiarCantidad(1)">+</button>
+      </div>
+      <span style="font-size:0.82rem;color:var(--texto-gris);"
+            th:text="${producto?.unidad ?: 'kg'}">kg</span>
+    </div>
+
+    <!-- Precio total dinámico -->
+    <div style="background:var(--crema);border-radius:var(--radio-sm);padding:10px 14px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:0.85rem;color:var(--texto-gris);">Total:</span>
+      <span id="precioTotal"
+            style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--verde-oscuro);">
+        $<span th:text="${#numbers.formatDecimal(producto?.precio ?: 0, 0,'COMMA',0,'POINT')}">0</span>
+      </span>
+    </div>
+
+    <!-- Botones -->
+    <div class="detalle-acciones">
+      <button class="btn-primary" style="flex:1;justify-content:center;"
+              th:data-id="${producto?.id}"
+              th:data-nombre="${producto?.nombre}"
+              th:data-precio="${producto?.precio}"
+              onclick="agregarAlCarritoDetalle(this)">
+        🛒 Agregar al carrito
+      </button>
+      <a th:href="@{/checkout(productoId=${producto?.id}, cantidad=1)}"
+         class="btn-secondary"
+         style="flex:1;text-align:center;padding:14px 32px;border-radius:var(--radio-pill);">
+        Comprar ahora
+      </a>
+    </div>
+
+    <!-- Garantías -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;">
+      <div style="background:white;border:1.5px solid var(--borde);border-radius:var(--radio-sm);padding:12px;font-size:0.8rem;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:1.2rem;">🚚</span>
+        <span>Envío a todo el país</span>
+      </div>
+      <div style="background:white;border:1.5px solid var(--borde);border-radius:var(--radio-sm);padding:12px;font-size:0.8rem;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:1.2rem;">💚</span>
+        <span>100% directo del campo</span>
+      </div>
+      <div style="background:white;border:1.5px solid var(--borde);border-radius:var(--radio-sm);padding:12px;font-size:0.8rem;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:1.2rem;">🔒</span>
+        <span>Pago seguro</span>
+      </div>
+      <div style="background:white;border:1.5px solid var(--borde);border-radius:var(--radio-sm);padding:12px;font-size:0.8rem;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:1.2rem;">⭐</span>
+        <span>Calidad garantizada</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PRODUCTOS RELACIONADOS -->
+<div class="section" th:if="${relacionados != null and !#lists.isEmpty(relacionados)}">
+  <div class="section-header">
+    <h2>También te puede <span>gustar</span></h2>
+    <a th:href="@{/productos}" class="ver-mas">Ver todos →</a>
+  </div>
+  <div class="productos-grid">
+    <a th:each="rel : ${relacionados}"
+       th:href="@{/productos/{id}(id=${rel.id})}"
+       class="producto-card">
+      <div class="producto-img">
+        <img th:if="${rel.imagen != null}" th:src="@{'/uploads/' + ${rel.imagen}}" th:alt="${rel.nombre}"/>
+        <span th:unless="${rel.imagen != null}" th:text="${rel.icono ?: '🥬'}">🥬</span>
+        <span class="badge-fresco">Fresco</span>
+      </div>
+      <div class="producto-info">
+        <div class="producto-categoria" th:text="${rel.categoria?.nombre}">Cat</div>
+        <div class="producto-nombre" th:text="${rel.nombre}">Nombre</div>
+        <div class="producto-campesino">👨‍🌾 <span th:text="${rel.usuario?.nombre}">Campesino</span></div>
+        <div class="producto-footer">
+          <div class="producto-precio">
+            $<span th:text="${#numbers.formatDecimal(rel.precio,0,'COMMA',0,'POINT')}">0</span>
+            <span class="unidad">/ <span th:text="${rel.unidad}">kg</span></span>
+          </div>
+          <button class="btn-agregar" th:data-id="${rel.id}"
+                  onclick="agregarAlCarrito(this); event.preventDefault();">+</button>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-bottom" style="max-width:1280px;margin:0 auto;padding:20px 24px;">
+    <p>© 2025 <span>MATTA</span> — Lo natural es lo real</p>
+    <p>Hecho con 💚 en Colombia</p>
+  </div>
+</footer>
+
+<script th:inline="javascript">
+  const precioUnitario = /*[[${producto?.precio ?: 0}]]*/ 0;
+
+  function cambiarCantidad(delta) {
+    const el  = document.getElementById('cantidad');
+    let   val = parseInt(el.textContent) + delta;
+    if (val < 1) val = 1;
+    el.textContent = val;
+    const total = (precioUnitario * val).toLocaleString('es-CO');
+    document.getElementById('precioTotal').innerHTML =
+      '$<span>' + total + '</span>';
+  }
+
+  function agregarAlCarritoDetalle(btn) {
+    const id       = btn.dataset.id;
+    const cantidad = document.getElementById('cantidad').textContent;
+    fetch('/carrito/agregar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `productoId=${id}&cantidad=${cantidad}`
+    }).then(res => {
+      if (res.ok) {
+        btn.textContent = '✓ Agregado';
+        btn.style.background = 'var(--verde-oscuro)';
+        setTimeout(() => { btn.textContent = '🛒 Agregar al carrito'; btn.style.background = ''; }, 2000);
+        const badge = document.querySelector('.cart-badge');
+        if (badge) badge.textContent = parseInt(badge.textContent || 0) + parseInt(cantidad);
+      } else if (res.status === 401) {
+        window.location.href = '/login';
+      }
+    });
+  }
+
+  function agregarAlCarrito(btn) {
+    const id = btn.dataset.id;
+    fetch('/carrito/agregar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `productoId=${id}&cantidad=1`
+    }).then(res => {
+      if (res.ok) {
+        btn.textContent = '✓';
+        setTimeout(() => { btn.textContent = '+'; }, 1500);
+      } else if (res.status === 401) {
+        window.location.href = '/login';
+      }
+    });
+  }
+
+  function buscar() {
+    const q = document.getElementById('searchInput').value.trim();
+    if (q) window.location.href = '/productos?q=' + encodeURIComponent(q);
+  }
+  document.getElementById('searchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') buscar();
+  });
+</script>
+
+</body>
+</html>

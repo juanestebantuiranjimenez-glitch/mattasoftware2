@@ -1,50 +1,405 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Tienda MATTA</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .product-card { transition: transform 0.2s; }
-        .product-card:hover { transform: scale(1.05); }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Productos — MATTA</title>
+  <link rel="stylesheet" th:href="@{/css/matta.css}"/>
+  <style>
+    .catalogo-layout {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    .filtros-panel {
+      background: white;
+      border: 1.5px solid var(--borde);
+      border-radius: var(--radio);
+      padding: 20px;
+      position: sticky;
+      top: 88px;
+    }
+    .filtros-panel h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--verde-oscuro);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--borde);
+    }
+    .filtro-grupo { margin-bottom: 20px; }
+    .filtro-grupo label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--texto-gris);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .filtro-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      color: var(--texto-oscuro);
+    }
+    .filtro-check input { accent-color: var(--verde-suave); }
+    .rango-precio {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .rango-precio input {
+      width: 90px;
+      border: 1.5px solid var(--borde);
+      border-radius: var(--radio-sm);
+      padding: 7px 10px;
+      font-size: 0.83rem;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+    }
+    .rango-precio input:focus { border-color: var(--verde-suave); }
+    .btn-filtrar {
+      width: 100%;
+      background: var(--verde-oscuro);
+      color: var(--verde-lima);
+      border: none;
+      border-radius: var(--radio-sm);
+      padding: 11px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+    .btn-filtrar:hover { background: var(--verde-medio); }
+    .btn-limpiar {
+      width: 100%;
+      background: none;
+      color: var(--texto-gris);
+      border: 1.5px solid var(--borde);
+      border-radius: var(--radio-sm);
+      padding: 9px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.83rem;
+      cursor: pointer;
+      margin-top: 6px;
+      transition: all 0.2s;
+    }
+    .btn-limpiar:hover { border-color: var(--verde-suave); color: var(--verde-medio); }
+
+    .catalogo-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .catalogo-header h2 { font-size: 1.4rem; font-weight: 900; color: var(--verde-oscuro); }
+    .catalogo-header p  { font-size: 0.85rem; color: var(--texto-gris); }
+    .sort-select {
+      border: 1.5px solid var(--borde);
+      border-radius: var(--radio-sm);
+      padding: 8px 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      color: var(--texto-oscuro);
+      background: white;
+      outline: none;
+      cursor: pointer;
+    }
+    .sort-select:focus { border-color: var(--verde-suave); }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--texto-gris);
+    }
+    .empty-state .empty-icon { font-size: 4rem; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 1.2rem; color: var(--verde-oscuro); margin-bottom: 8px; }
+
+    @media (max-width: 768px) {
+      .catalogo-layout { grid-template-columns: 1fr; }
+      .filtros-panel { position: static; }
+    }
+  </style>
 </head>
-<body class="bg-light">
-    <div th:replace="~{fragments/navbar :: navbar}"></div>
+<body>
 
-    <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="text-success fw-bold">Productos del Campo</h1>
-            <a th:href="@{/productos/nuevo}" class="btn btn-success">+ Subir Producto</a>
-        </div>
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a th:href="@{/}" class="navbar-logo">🌿 MATTA</a>
+    <div class="navbar-search">
+      <input type="text" id="searchInput"
+             th:value="${param.q}"
+             placeholder="Buscar productos…"/>
+      <button onclick="buscar()">🔍</button>
+    </div>
+    <nav class="navbar-nav">
+      <a th:href="@{/productos}" class="nav-link active">Productos</a>
+      <a th:href="@{/campesinos}" class="nav-link">Campesinos</a>
+      <th:block th:if="${session.usuario != null}">
+        <a th:href="@{/carrito}" class="nav-carrito">🛒
+          <span class="cart-badge" th:text="${session.cantidadCarrito ?: 0}">0</span>
+        </a>
+        <a th:href="@{/dashboard}" class="nav-link">Mi Panel</a>
+        <a th:href="@{/logout}" class="nav-btn">Salir</a>
+      </th:block>
+      <th:block th:unless="${session.usuario != null}">
+        <a th:href="@{/login}" class="nav-link">Ingresar</a>
+        <a th:href="@{/registro}" class="nav-btn">Registrarse</a>
+      </th:block>
+    </nav>
+  </div>
+</nav>
 
-        <!-- Aquí empieza la cuadrícula de tarjetas -->
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-            <!-- th:each recorre la lista y crea una tarjeta por cada producto -->
-            <div class="col" th:each="p : ${listaProductos}">
-                <div class="card h-100 shadow-sm product-card">
-                    <!-- Imagen de prueba (luego la cambiaremos por la real) -->
-                    <!-- Si el producto tiene imagen en la BD, la busca en la carpeta /img/ -->
-                      <!-- Si no tiene, pone una por defecto de internet -->
-                       <img th:src="${p.imagen != null && p.imagen != ''} ? '/img/' + ${p.imagen} : 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=500'" 
-                  class="card-img-top" alt="Producto" style="height: 200px; object-fit: cover;">
-                <div class="card-body">
-                        <h5 class="card-title fw-bold" th:text="${p.nombre}">Nombre</h5>
-                        <p class="card-text text-muted" th:text="${p.descripcion}">Descripción corta del producto.</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="h5 text-success mb-0" th:text="'$' + ${p.precio}">$0.00</span>
-                            <span class="badge bg-info text-dark" th:text="${p.cantidad_disponible} + ' disp.'">10 disp.</span>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-transparent border-top-0 pb-3">
-                        <button class="btn btn-outline-success w-100">Añadir al Carrito</button>
-                    </div>
-                </div>
-            </div>
+<!-- BREADCRUMB -->
+<div style="background: var(--crema); border-bottom: 1px solid var(--borde); padding: 10px 24px;">
+  <div style="max-width:1280px;margin:0 auto;font-size:0.82rem;color:var(--texto-gris);">
+    <a th:href="@{/}" style="color:var(--verde-suave);">Inicio</a>
+    <span style="margin:0 8px;">›</span>
+    <span>Productos</span>
+    <th:block th:if="${categoriaActual != null}">
+      <span style="margin:0 8px;">›</span>
+      <span th:text="${categoriaActual.nombre}">Categoría</span>
+    </th:block>
+  </div>
+</div>
+
+<!-- LAYOUT PRINCIPAL -->
+<div class="catalogo-layout">
+
+  <!-- ─── PANEL DE FILTROS ─── -->
+  <aside class="filtros-panel">
+    <h3>🔧 Filtrar</h3>
+
+    <form th:action="@{/productos}" method="get" id="form-filtro">
+
+      <!-- Categorías -->
+      <div class="filtro-grupo">
+        <label>Categoría</label>
+        <th:block th:each="cat : ${categorias}">
+          <div class="filtro-check">
+            <input type="radio" name="categoria"
+                   th:id="'cat-' + ${cat.id}"
+                   th:value="${cat.id}"
+                   th:checked="${param.categoria == cat.id?.toString()}"/>
+            <label th:for="'cat-' + ${cat.id}" style="text-transform:none;letter-spacing:0;font-weight:400;margin:0;">
+              <span th:text="${cat.icono + ' ' + cat.nombre}">🌿 Categoría</span>
+            </label>
+          </div>
+        </th:block>
+        <!-- Fallback estático -->
+        <th:block th:unless="${categorias != null and !categorias.isEmpty()}">
+          <div class="filtro-check"><input type="radio" name="categoria" value="frutas"/>   <span>🍎 Frutas</span></div>
+          <div class="filtro-check"><input type="radio" name="categoria" value="verduras"/> <span>🥦 Verduras</span></div>
+          <div class="filtro-check"><input type="radio" name="categoria" value="cafe"/>     <span>☕ Café</span></div>
+          <div class="filtro-check"><input type="radio" name="categoria" value="granos"/>   <span>🌾 Granos</span></div>
+          <div class="filtro-check"><input type="radio" name="categoria" value="tuberculos"/><span>🥔 Tubérculos</span></div>
+        </th:block>
+      </div>
+
+      <!-- Precio -->
+      <div class="filtro-grupo">
+        <label>Precio (COP)</label>
+        <div class="rango-precio">
+          <input type="number" name="precioMin" placeholder="Mín"
+                 th:value="${param.precioMin}" min="0" step="500"/>
+          <span style="color:var(--texto-gris);">—</span>
+          <input type="number" name="precioMax" placeholder="Máx"
+                 th:value="${param.precioMax}" min="0" step="500"/>
         </div>
+      </div>
+
+      <!-- Departamento -->
+      <div class="filtro-grupo">
+        <label>Departamento</label>
+        <select name="departamento" style="width:100%;border:1.5px solid var(--borde);border-radius:var(--radio-sm);padding:8px 10px;font-family:'DM Sans',sans-serif;font-size:0.85rem;outline:none;">
+          <option value="">Todos</option>
+          <option value="risaralda"  th:selected="${param.departamento == 'risaralda'}">Risaralda</option>
+          <option value="caldas"     th:selected="${param.departamento == 'caldas'}">Caldas</option>
+          <option value="quindio"    th:selected="${param.departamento == 'quindio'}">Quindío</option>
+          <option value="antioquia"  th:selected="${param.departamento == 'antioquia'}">Antioquia</option>
+          <option value="valle"      th:selected="${param.departamento == 'valle'}">Valle del Cauca</option>
+        </select>
+      </div>
+
+      <!-- Disponibilidad -->
+      <div class="filtro-grupo">
+        <label>Disponibilidad</label>
+        <div class="filtro-check">
+          <input type="checkbox" name="soloDisponibles" value="true"
+                 th:checked="${param.soloDisponibles == 'true'}"/>
+          <span>Solo con stock</span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-filtrar">Aplicar filtros</button>
+      <a th:href="@{/productos}"><button type="button" class="btn-limpiar">Limpiar filtros</button></a>
+    </form>
+  </aside>
+
+  <!-- ─── GRID DE PRODUCTOS ─── -->
+  <div>
+    <div class="catalogo-header">
+      <div>
+        <h2>
+          <th:block th:if="${categoriaActual != null}"
+                    th:text="${categoriaActual.icono + ' ' + categoriaActual.nombre}">Todos los productos</th:block>
+          <th:block th:unless="${categoriaActual != null}">Todos los productos</th:block>
+        </h2>
+        <p th:if="${productos != null}"
+           th:text="${productos.totalElements != null ? productos.totalElements + ' resultados encontrados' : productos.size() + ' productos'}">
+          Resultados
+        </p>
+      </div>
+      <select class="sort-select" onchange="ordenar(this.value)">
+        <option value="reciente"   th:selected="${param.orden == 'reciente'}">Más recientes</option>
+        <option value="precio_asc" th:selected="${param.orden == 'precio_asc'}">Precio: menor a mayor</option>
+        <option value="precio_desc"th:selected="${param.orden == 'precio_desc'}">Precio: mayor a menor</option>
+        <option value="nombre"     th:selected="${param.orden == 'nombre'}">Nombre A–Z</option>
+      </select>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <div th:replace="~{fragments/footer :: footer}"></div>
+    <!-- Resultados de búsqueda -->
+    <div th:if="${param.q != null}"
+         style="background:var(--crema);border-radius:var(--radio-sm);padding:10px 14px;margin-bottom:16px;font-size:0.88rem;">
+      🔍 Resultados para: <strong th:text="${param.q}">búsqueda</strong>
+      <a th:href="@{/productos}" style="color:var(--verde-suave);margin-left:12px;font-weight:600;">✕ Borrar</a>
+    </div>
+
+    <!-- GRID -->
+    <div class="productos-grid">
+
+      <th:block th:if="${productos != null and !#lists.isEmpty(productos)}">
+        <th:block th:each="prod : ${productos}">
+          <a th:href="@{/productos/{id}(id=${prod.id})}" class="producto-card">
+            <div class="producto-img">
+              <img th:if="${prod.imagen != null}"
+                   th:src="@{'/uploads/' + ${prod.imagen}}"
+                   th:alt="${prod.nombre}"/>
+              <span th:unless="${prod.imagen != null}"
+                    th:text="${prod.icono ?: '🥬'}">🥬</span>
+              <span class="badge-fresco">Fresco</span>
+              <span th:if="${prod.enOferta}" class="badge-oferta">Oferta</span>
+            </div>
+            <div class="producto-info">
+              <div class="producto-categoria"
+                   th:text="${prod.categoria?.nombre ?: 'Producto'}">Cat</div>
+              <div class="producto-nombre" th:text="${prod.nombre}">Nombre</div>
+              <div class="producto-campesino">
+                👨‍🌾 <span th:text="${prod.usuario?.nombre ?: 'Campesino'}">Campesino</span>
+                <span th:if="${prod.usuario?.ubicacion != null}"
+                      th:text="'— ' + ${prod.usuario.ubicacion}"
+                      style="color:var(--borde);">— Ciudad</span>
+              </div>
+              <div class="producto-footer">
+                <div class="producto-precio">
+                  $<span th:text="${#numbers.formatDecimal(prod.precio,0,'COMMA',0,'POINT')}">0</span>
+                  <span class="unidad">/ <span th:text="${prod.unidad ?: 'kg'}">kg</span></span>
+                </div>
+                <button class="btn-agregar"
+                        th:data-id="${prod.id}"
+                        th:data-nombre="${prod.nombre}"
+                        onclick="agregarAlCarrito(this); event.preventDefault();"
+                        title="Agregar al carrito">+</button>
+              </div>
+            </div>
+          </a>
+        </th:block>
+      </th:block>
+
+      <!-- Estado vacío -->
+      <div class="empty-state" th:unless="${productos != null and !#lists.isEmpty(productos)}">
+        <div class="empty-icon">🌿</div>
+        <h3>No se encontraron productos</h3>
+        <p>Intenta con otros filtros o categorías</p>
+        <a th:href="@{/productos}" class="btn-primary" style="margin-top:16px;display:inline-flex;">
+          Ver todos los productos
+        </a>
+      </div>
+
+    </div>
+
+    <!-- PAGINACIÓN -->
+    <div th:if="${productos != null and productos.totalPages > 1}"
+         style="display:flex;justify-content:center;gap:8px;margin-top:32px;flex-wrap:wrap;">
+      <a th:if="${!productos.first}"
+         th:href="@{/productos(page=${productos.number - 1}, q=${param.q}, categoria=${param.categoria}, orden=${param.orden})}"
+         style="padding:8px 16px;border:1.5px solid var(--borde);border-radius:var(--radio-sm);font-size:0.85rem;background:white;">
+        ← Anterior
+      </a>
+      <th:block th:each="i : ${#numbers.sequence(0, productos.totalPages - 1)}">
+        <a th:href="@{/productos(page=${i}, q=${param.q}, categoria=${param.categoria}, orden=${param.orden})}"
+           th:text="${i + 1}"
+           th:style="${i == productos.number ? 'background:var(--verde-oscuro);color:var(--verde-lima);' : 'background:white;'}"
+           style="padding:8px 14px;border:1.5px solid var(--borde);border-radius:var(--radio-sm);font-size:0.85rem;">1</a>
+      </th:block>
+      <a th:if="${!productos.last}"
+         th:href="@{/productos(page=${productos.number + 1}, q=${param.q}, categoria=${param.categoria}, orden=${param.orden})}"
+         style="padding:8px 16px;border:1.5px solid var(--borde);border-radius:var(--radio-sm);font-size:0.85rem;background:white;">
+        Siguiente →
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER SIMPLE -->
+<footer class="footer" style="margin-top:48px;">
+  <div class="footer-bottom" style="max-width:1280px;margin:0 auto;padding:20px 24px;">
+    <p>© 2025 <span>MATTA</span> — Lo natural es lo real</p>
+    <p>Hecho con 💚 en Colombia</p>
+  </div>
+</footer>
+
+<script>
+  function buscar() {
+    const q = document.getElementById('searchInput').value.trim();
+    if (q) window.location.href = '/productos?q=' + encodeURIComponent(q);
+  }
+  document.getElementById('searchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') buscar();
+  });
+
+  function ordenar(valor) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('orden', valor);
+    url.searchParams.delete('page');
+    window.location.href = url.toString();
+  }
+
+  function agregarAlCarrito(btn) {
+    const id = btn.dataset.id;
+    fetch('/carrito/agregar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `productoId=${id}&cantidad=1`
+    }).then(res => {
+      if (res.ok) {
+        btn.textContent = '✓';
+        btn.style.background = 'var(--verde-oscuro)';
+        btn.style.color = 'var(--verde-lima)';
+        setTimeout(() => { btn.textContent = '+'; btn.style.background = ''; btn.style.color = ''; }, 1500);
+        const badge = document.querySelector('.cart-badge');
+        if (badge) badge.textContent = parseInt(badge.textContent || 0) + 1;
+      } else if (res.status === 401) {
+        window.location.href = '/login';
+      }
+    });
+  }
+</script>
+
 </body>
 </html>

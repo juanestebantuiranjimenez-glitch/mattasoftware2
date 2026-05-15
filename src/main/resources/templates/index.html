@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MATTA — Lo Natural es lo Real</title>
+  <link rel="stylesheet" th:href="@{/css/matta.css}"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>"/>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════════ -->
+<nav class="navbar">
+  <div class="navbar-inner">
+
+    <a th:href="@{/}" class="navbar-logo">
+      <span class="logo-leaf">🌿</span> MATTA
+    </a>
+
+    <div class="navbar-search">
+      <input type="text" placeholder="Buscar frutas, verduras, café…"
+             id="searchInput" autocomplete="off"/>
+      <button onclick="buscar()">🔍</button>
+    </div>
+
+    <nav class="navbar-nav">
+      <a th:href="@{/productos}" class="nav-link">Productos</a>
+      <a th:href="@{/campesinos}" class="nav-link">Campesinos</a>
+
+      <!-- Si el usuario está logueado -->
+      <th:block th:if="${session.usuario != null}">
+        <a th:href="@{/carrito}" class="nav-carrito" title="Mi carrito">
+          🛒
+          <span class="cart-badge" th:text="${session.cantidadCarrito ?: 0}">0</span>
+        </a>
+        <a th:href="@{/dashboard}" class="nav-link">Mi Panel</a>
+        <a th:href="@{/logout}" class="nav-btn">Salir</a>
+      </th:block>
+
+      <!-- Si NO está logueado -->
+      <th:block th:unless="${session.usuario != null}">
+        <a th:href="@{/login}" class="nav-link">Ingresar</a>
+        <a th:href="@{/registro}" class="nav-btn">Registrarse</a>
+      </th:block>
+    </nav>
+
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     HERO
+════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge fade-in">🌱 Del campo a tu mesa, sin intermediarios</div>
+    <h1 class="fade-in fade-in-1">
+      Compra <span>directo</span> al<br/>campesino colombiano
+    </h1>
+    <p class="fade-in fade-in-2">
+      Frutas, verduras, café y más — frescos, justos y directos desde
+      el Eje Cafetero y toda Colombia hasta tu hogar.
+    </p>
+    <div class="hero-btns fade-in fade-in-3">
+      <a th:href="@{/productos}" class="btn-primary">
+        🛍️ Ver productos
+      </a>
+      <a th:href="@{/como-funciona}" class="btn-secondary">
+        ¿Cómo funciona?
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     STATS
+════════════════════════════════════════════ -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <span class="stat-icon">👨‍🌾</span>
+      <div class="stat-text">
+        <strong th:text="${totalCampesinos ?: '120+'}">120+</strong>
+        <span>Campesinos activos</span>
+      </div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-icon">🥦</span>
+      <div class="stat-text">
+        <strong th:text="${totalProductos ?: '500+'}">500+</strong>
+        <span>Productos disponibles</span>
+      </div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-icon">📦</span>
+      <div class="stat-text">
+        <strong th:text="${totalPedidos ?: '2.4k+'}">2.4k+</strong>
+        <span>Pedidos entregados</span>
+      </div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-icon">💰</span>
+      <div class="stat-text">
+        <strong>60-70%</strong>
+        <span>Más ganancia para el campo</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     CATEGORÍAS
+════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <h2>Explorar por <span>categoría</span></h2>
+    <a th:href="@{/productos}" class="ver-mas">Ver todas →</a>
+  </div>
+  <div class="categorias-grid">
+
+    <!-- Categorías dinámicas desde el backend -->
+    <th:block th:if="${categorias != null and !categorias.isEmpty()}">
+      <a th:each="cat : ${categorias}"
+         th:href="@{/productos(categoria=${cat.id})}"
+         class="categoria-chip">
+        <span class="cat-icon" th:text="${cat.icono}">🌿</span>
+        <span class="cat-name" th:text="${cat.nombre}">Categoría</span>
+      </a>
+    </th:block>
+
+    <!-- Categorías estáticas de fallback -->
+    <th:block th:unless="${categorias != null and !categorias.isEmpty()}">
+      <a href="/productos?categoria=frutas"    class="categoria-chip"><span class="cat-icon">🍎</span><span class="cat-name">Frutas</span></a>
+      <a href="/productos?categoria=verduras"  class="categoria-chip"><span class="cat-icon">🥦</span><span class="cat-name">Verduras</span></a>
+      <a href="/productos?categoria=tuberculos"class="categoria-chip"><span class="cat-icon">🥔</span><span class="cat-name">Tubérculos</span></a>
+      <a href="/productos?categoria=cafe"      class="categoria-chip"><span class="cat-icon">☕</span><span class="cat-name">Café</span></a>
+      <a href="/productos?categoria=granos"    class="categoria-chip"><span class="cat-icon">🌾</span><span class="cat-name">Granos</span></a>
+      <a href="/productos?categoria=hierbas"   class="categoria-chip"><span class="cat-icon">🌿</span><span class="cat-name">Hierbas</span></a>
+      <a href="/productos?categoria=huevos"    class="categoria-chip"><span class="cat-icon">🥚</span><span class="cat-name">Huevos</span></a>
+      <a href="/productos?categoria=lacteos"   class="categoria-chip"><span class="cat-icon">🧀</span><span class="cat-name">Lácteos</span></a>
+      <a href="/productos?categoria=miel"      class="categoria-chip"><span class="cat-icon">🍯</span><span class="cat-name">Miel</span></a>
+    </th:block>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PRODUCTOS DESTACADOS
+════════════════════════════════════════════ -->
+<div class="section" style="padding-top: 0;">
+  <div class="section-header">
+    <h2>Productos <span>frescos hoy</span></h2>
+    <a th:href="@{/productos}" class="ver-mas">Ver todos →</a>
+  </div>
+
+  <div class="productos-grid">
+
+    <!-- Productos dinámicos desde el backend -->
+    <th:block th:if="${productosDestacados != null and !productosDestacados.isEmpty()}">
+      <a th:each="prod : ${productosDestacados}"
+         th:href="@{/productos/{id}(id=${prod.id})}"
+         class="producto-card fade-in">
+        <div class="producto-img">
+          <img th:if="${prod.imagen != null}" th:src="@{'/uploads/' + ${prod.imagen}}" th:alt="${prod.nombre}"/>
+          <span th:unless="${prod.imagen != null}" th:text="${prod.icono ?: '🥬'}">🥬</span>
+          <span class="badge-fresco">Fresco</span>
+        </div>
+        <div class="producto-info">
+          <div class="producto-categoria" th:text="${prod.categoria?.nombre ?: 'Producto'}">Categoría</div>
+          <div class="producto-nombre"    th:text="${prod.nombre}">Nombre producto</div>
+          <div class="producto-campesino">
+            👨‍🌾 <span th:text="${prod.usuario?.nombre ?: 'Campesino'}">Campesino</span>
+          </div>
+          <div class="producto-footer">
+            <div class="producto-precio">
+              $<span th:text="${#numbers.formatDecimal(prod.precio, 0, 'COMMA', 0, 'POINT')}">0</span>
+              <span class="unidad">/ <span th:text="${prod.unidad ?: 'kg'}">kg</span></span>
+            </div>
+            <button class="btn-agregar"
+                    th:data-id="${prod.id}"
+                    th:data-nombre="${prod.nombre}"
+                    th:data-precio="${prod.precio}"
+                    onclick="agregarAlCarrito(this); event.preventDefault();"
+                    title="Agregar al carrito">+</button>
+          </div>
+        </div>
+      </a>
+    </th:block>
+
+    <!-- Cards de muestra si no hay datos aún -->
+    <th:block th:unless="${productosDestacados != null and !productosDestacados.isEmpty()}">
+      <div class="producto-card fade-in fade-in-1">
+        <div class="producto-img"><span>🍅</span><span class="badge-fresco">Fresco</span></div>
+        <div class="producto-info">
+          <div class="producto-categoria">Verduras</div>
+          <div class="producto-nombre">Tomate Chonto</div>
+          <div class="producto-campesino">👨‍🌾 Don José — Risaralda</div>
+          <div class="producto-footer">
+            <div class="producto-precio">$2.800 <span class="unidad">/ kg</span></div>
+            <button class="btn-agregar">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="producto-card fade-in fade-in-2">
+        <div class="producto-img"><span>🥦</span><span class="badge-fresco">Fresco</span></div>
+        <div class="producto-info">
+          <div class="producto-categoria">Verduras</div>
+          <div class="producto-nombre">Brócoli Orgánico</div>
+          <div class="producto-campesino">👨‍🌾 María López — Caldas</div>
+          <div class="producto-footer">
+            <div class="producto-precio">$3.500 <span class="unidad">/ kg</span></div>
+            <button class="btn-agregar">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="producto-card fade-in fade-in-3">
+        <div class="producto-img"><span>☕</span><span class="badge-fresco">Premium</span></div>
+        <div class="producto-info">
+          <div class="producto-categoria">Café</div>
+          <div class="producto-nombre">Café Especial 500g</div>
+          <div class="producto-campesino">👨‍🌾 Finca El Paraíso — Quindío</div>
+          <div class="producto-footer">
+            <div class="producto-precio">$28.000 <span class="unidad">/ bolsa</span></div>
+            <button class="btn-agregar">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="producto-card fade-in fade-in-4">
+        <div class="producto-img"><span>🍌</span><span class="badge-fresco">Fresco</span></div>
+        <div class="producto-info">
+          <div class="producto-categoria">Frutas</div>
+          <div class="producto-nombre">Plátano Hartón</div>
+          <div class="producto-campesino">👨‍🌾 Carlos Ríos — Urabá</div>
+          <div class="producto-footer">
+            <div class="producto-precio">$1.200 <span class="unidad">/ kg</span></div>
+            <button class="btn-agregar">+</button>
+          </div>
+        </div>
+      </div>
+    </th:block>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     BANNER CAMPESINO
+════════════════════════════════════════════ -->
+<div style="padding: 0 0 48px;">
+  <div class="campesino-banner">
+    <div class="banner-texto">
+      <h2>¿Eres campesino o productor?</h2>
+      <p>
+        Vende directamente tus productos a miles de familias colombianas.
+        Sin intermediarios, más ganancia para ti y tu familia.
+        Regístrate gratis en minutos.
+      </p>
+    </div>
+    <div class="banner-btns">
+      <a th:href="@{/registro}" class="btn-primary">👨‍🌾 Quiero vender</a>
+      <a th:href="@{/como-funciona}" class="btn-secondary">Conocer más</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     CÓMO FUNCIONA
+════════════════════════════════════════════ -->
+<div class="section" style="text-align: center; padding-top: 0;">
+  <div class="section-header" style="justify-content: center; flex-direction: column; align-items: center; text-align: center;">
+    <h2>¿Cómo <span>funciona</span> MATTA?</h2>
+    <p style="color: var(--texto-gris); margin-top: 8px; max-width: 500px;">
+      Simple como ir a la plaza de mercado, pero desde tu casa
+    </p>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-top: 32px;">
+    <div style="background: white; border-radius: 16px; padding: 28px 20px; border: 1.5px solid var(--borde);">
+      <div style="font-size: 2.5rem; margin-bottom: 14px;">🔍</div>
+      <h3 style="font-size: 1rem; margin-bottom: 8px; color: var(--verde-oscuro);">1. Explora</h3>
+      <p style="font-size: 0.85rem; color: var(--texto-gris);">Navega los productos frescos que los campesinos publican cada día.</p>
+    </div>
+    <div style="background: white; border-radius: 16px; padding: 28px 20px; border: 1.5px solid var(--borde);">
+      <div style="font-size: 2.5rem; margin-bottom: 14px;">🛒</div>
+      <h3 style="font-size: 1rem; margin-bottom: 8px; color: var(--verde-oscuro);">2. Elige y pide</h3>
+      <p style="font-size: 0.85rem; color: var(--texto-gris);">Agrega al carrito y confirma tu pedido de forma rápida y segura.</p>
+    </div>
+    <div style="background: white; border-radius: 16px; padding: 28px 20px; border: 1.5px solid var(--borde);">
+      <div style="font-size: 2.5rem; margin-bottom: 14px;">🚚</div>
+      <h3 style="font-size: 1rem; margin-bottom: 8px; color: var(--verde-oscuro);">3. Recibe en casa</h3>
+      <p style="font-size: 0.85rem; color: var(--texto-gris);">El producto llega fresco directamente desde la finca a tu puerta.</p>
+    </div>
+    <div style="background: white; border-radius: 16px; padding: 28px 20px; border: 1.5px solid var(--borde);">
+      <div style="font-size: 2.5rem; margin-bottom: 14px;">💚</div>
+      <h3 style="font-size: 1rem; margin-bottom: 8px; color: var(--verde-oscuro);">4. Apoya el campo</h3>
+      <p style="font-size: 0.85rem; color: var(--texto-gris);">Tu compra va directo al bolsillo del campesino. Sin intermediarios.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="brand-name">🌿 MATTA</div>
+      <p>Marketplace agrícola colombiano.<br/>
+         Conectamos campesinos con consumidores,<br/>
+         eliminando la cadena de intermediarios.</p>
+      <p style="margin-top: 12px; font-size: 0.8rem;">
+        📍 Pereira, Risaralda — Colombia
+      </p>
+    </div>
+    <div class="footer-col">
+      <h4>Comprar</h4>
+      <ul>
+        <li><a th:href="@{/productos}">Todos los productos</a></li>
+        <li><a th:href="@{/productos?categoria=frutas}">Frutas</a></li>
+        <li><a th:href="@{/productos?categoria=verduras}">Verduras</a></li>
+        <li><a th:href="@{/productos?categoria=cafe}">Café</a></li>
+        <li><a th:href="@{/campesinos}">Nuestros campesinos</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Vender</h4>
+      <ul>
+        <li><a th:href="@{/registro}">Registrarme</a></li>
+        <li><a th:href="@{/como-funciona}">Cómo funciona</a></li>
+        <li><a th:href="@{/dashboard}">Mi panel</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Ayuda</h4>
+      <ul>
+        <li><a th:href="@{/preguntas-frecuentes}">Preguntas frecuentes</a></li>
+        <li><a th:href="@{/contacto}">Contacto</a></li>
+        <li><a th:href="@{/terminos}">Términos y condiciones</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 <span>MATTA</span> — Lo natural es lo real</p>
+    <p>Hecho con 💚 en Colombia</p>
+  </div>
+</footer>
+
+<script>
+  // Buscar productos
+  function buscar() {
+    const q = document.getElementById('searchInput').value.trim();
+    if (q) window.location.href = '/productos?q=' + encodeURIComponent(q);
+  }
+  document.getElementById('searchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') buscar();
+  });
+
+  // Agregar al carrito (llama al backend con fetch)
+  function agregarAlCarrito(btn) {
+    const id     = btn.dataset.id;
+    const nombre = btn.dataset.nombre;
+    fetch('/carrito/agregar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `productoId=${id}&cantidad=1`
+    })
+    .then(res => {
+      if (res.ok) {
+        btn.textContent = '✓';
+        btn.style.background = 'var(--verde-oscuro)';
+        btn.style.color = 'var(--verde-lima)';
+        setTimeout(() => {
+          btn.textContent = '+';
+          btn.style.background = '';
+          btn.style.color = '';
+        }, 1500);
+        // Actualizar badge del carrito
+        const badge = document.querySelector('.cart-badge');
+        if (badge) badge.textContent = parseInt(badge.textContent || 0) + 1;
+      } else if (res.status === 401) {
+        window.location.href = '/login';
+      }
+    });
+  }
+</script>
+
+</body>
+</html>

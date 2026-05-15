@@ -1,11 +1,167 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head></head>
 <body>
-    <footer th:fragment="footer" class="bg-dark text-white pt-4 pb-2 mt-5">
-        <div class="container text-center">
-            <p class="mb-1 fw-bold">MATTA - Marketplace Agrícola</p>
-            <p class="small text-secondary">© 2024 Proyecto de Software - Todos los derechos reservados.</p>
-        </div>
-    </footer>
+
+<footer th:fragment="footer" class="matta-footer">
+  <div class="matta-footer-inner">
+
+    <!-- Columna 1: Marca -->
+    <div class="matta-footer-brand">
+      <div class="matta-footer-logo">🌿 MATTA</div>
+      <p>Marketplace agrícola colombiano.<br/>
+         Conectamos campesinos con consumidores,<br/>
+         eliminando la cadena de intermediarios.</p>
+      <p style="margin-top:12px; font-size:0.8rem;">
+        📍 Pereira, Risaralda — Colombia
+      </p>
+    </div>
+
+    <!-- Columna 2: Comprar -->
+    <div class="matta-footer-col">
+      <h4>Comprar</h4>
+      <ul>
+        <li><a th:href="@{/productos}">Todos los productos</a></li>
+        <li><a th:href="@{/productos(categoria='frutas')}">Frutas</a></li>
+        <li><a th:href="@{/productos(categoria='verduras')}">Verduras</a></li>
+        <li><a th:href="@{/productos(categoria='cafe')}">Café</a></li>
+        <li><a th:href="@{/campesinos}">Nuestros campesinos</a></li>
+      </ul>
+    </div>
+
+    <!-- Columna 3: Vender -->
+    <div class="matta-footer-col">
+      <h4>Vender</h4>
+      <ul>
+        <li><a th:href="@{/registro}">Registrarme gratis</a></li>
+        <li><a th:href="@{/como-funciona}">¿Cómo funciona?</a></li>
+        <li><a th:href="@{/dashboard}">Mi panel</a></li>
+      </ul>
+    </div>
+
+    <!-- Columna 4: Ayuda -->
+    <div class="matta-footer-col">
+      <h4>Ayuda</h4>
+      <ul>
+        <li><a th:href="@{/preguntas-frecuentes}">Preguntas frecuentes</a></li>
+        <li><a th:href="@{/contacto}">Contáctanos</a></li>
+        <li><a th:href="@{/terminos}">Términos y condiciones</a></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Línea inferior -->
+  <div class="matta-footer-bottom">
+    <p>© 2025 <span>MATTA</span> — Lo natural es lo real</p>
+    <p>Hecho con 💚 en Colombia</p>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════
+     ESTILOS DEL FOOTER
+════════════════════════════════════ -->
+<style>
+  .matta-footer {
+    background: #1a2a08;
+    color: rgba(245,240,220,0.65);
+    padding: 52px 24px 0;
+    margin-top: 64px;
+    font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  }
+
+  .matta-footer-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 40px;
+  }
+
+  /* Logo */
+  .matta-footer-logo {
+    font-family: Georgia, serif;
+    font-size: 1.55rem;
+    font-weight: 900;
+    color: #c8e03a;
+    margin-bottom: 14px;
+  }
+
+  .matta-footer-brand p {
+    font-size: 0.85rem;
+    line-height: 1.75;
+  }
+
+  /* Columnas */
+  .matta-footer-col h4 {
+    color: #f5f0dc;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+  }
+
+  .matta-footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .matta-footer-col li {
+    margin-bottom: 9px;
+  }
+
+  .matta-footer-col a {
+    color: rgba(245,240,220,0.6);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+  }
+
+  .matta-footer-col a:hover {
+    color: #c8e03a;
+  }
+
+  /* Línea inferior */
+  .matta-footer-bottom {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 20px 0 24px;
+    border-top: 1px solid rgba(200,224,58,0.13);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.8rem;
+  }
+
+  .matta-footer-bottom span {
+    color: #c8e03a;
+    font-weight: 700;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .matta-footer-inner {
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+  }
+
+  @media (max-width: 540px) {
+    .matta-footer-inner {
+      grid-template-columns: 1fr;
+    }
+    .matta-footer-bottom {
+      flex-direction: column;
+      text-align: center;
+      gap: 6px;
+    }
+  }
+</style>
+
 </body>
 </html>
