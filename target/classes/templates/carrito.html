@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mi Carrito — MATTA</title>
+  <link rel="stylesheet" th:href="@{/css/matta.css}"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a th:href="@{/}" class="navbar-logo">🌿 MATTA</a>
+    <div class="navbar-search">
+      <input type="text" id="searchInput" placeholder="Buscar productos…"/>
+      <button onclick="buscar()">🔍</button>
+    </div>
+    <nav class="navbar-nav">
+      <a th:href="@{/productos}" class="nav-link">Productos</a>
+      <a th:href="@{/carrito}" class="nav-carrito nav-link active">🛒 Carrito
+        <span class="cart-badge" th:text="${itemsCarrito?.size() ?: 0}">0</span>
+      </a>
+      <th:block th:if="${session.usuario != null}">
+        <a th:href="@{/dashboard}" class="nav-link">Mi Panel</a>
+        <a th:href="@{/logout}" class="nav-btn">Salir</a>
+      </th:block>
+    </nav>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div style="background:var(--crema);border-bottom:1px solid var(--borde);padding:10px 24px;">
+  <div style="max-width:1280px;margin:0 auto;font-size:0.82rem;color:var(--texto-gris);">
+    <a th:href="@{/}" style="color:var(--verde-suave);">Inicio</a>
+    <span style="margin:0 8px;">›</span>
+    <span>Mi carrito</span>
+  </div>
+</div>
+
+<!-- CARRITO VACÍO -->
+<div th:if="${itemsCarrito == null or #lists.isEmpty(itemsCarrito)}"
+     style="text-align:center;padding:80px 24px;">
+  <div style="font-size:5rem;margin-bottom:20px;">🛒</div>
+  <h2 style="font-size:1.5rem;font-weight:900;color:var(--verde-oscuro);margin-bottom:10px;">
+    Tu carrito está vacío
+  </h2>
+  <p style="color:var(--texto-gris);margin-bottom:28px;">
+    Explora nuestros productos frescos directos del campo
+  </p>
+  <a th:href="@{/productos}" class="btn-primary">🌿 Ver productos</a>
+</div>
+
+<!-- CARRITO CON ITEMS -->
+<div class="carrito-layout" th:unless="${itemsCarrito == null or #lists.isEmpty(itemsCarrito)}">
+
+  <!-- ─── LISTA DE ITEMS ─── -->
+  <div>
+    <h1 class="carrito-titulo">
+      🛒 Mi carrito
+      <span style="font-size:0.9rem;font-weight:400;color:var(--texto-gris);">
+        (<span th:text="${itemsCarrito.size()}">0</span> productos)
+      </span>
+    </h1>
+
+    <!-- Mensajes -->
+    <div th:if="${mensajeCarrito}"
+         style="background:#d1fae5;color:#065f46;border-radius:var(--radio-sm);padding:10px 14px;font-size:0.85rem;margin-bottom:16px;">
+      ✅ <span th:text="${mensajeCarrito}">Mensaje</span>
+    </div>
+
+    <!-- Items -->
+    <div th:each="item : ${itemsCarrito}" class="carrito-item"
+         th:id="'item-' + ${item.producto?.id}">
+
+      <div class="carrito-item-img">
+        <img th:if="${item.producto?.imagen != null}"
+             th:src="@{'/uploads/' + ${item.producto.imagen}}"
+             th:alt="${item.producto.nombre}"/>
+        <span th:unless="${item.producto?.imagen != null}"
+              th:text="${item.producto?.icono ?: '🥬'}">🥬</span>
+      </div>
+
+      <div class="carrito-item-info">
+        <div class="carrito-item-nombre" th:text="${item.producto?.nombre}">Producto</div>
+        <div class="carrito-item-vendedor">
+          👨‍🌾 <span th:text="${item.producto?.usuario?.nombre ?: 'Campesino'}">Campesino</span>
+          · $<span th:text="${#numbers.formatDecimal(item.producto?.precio ?: 0,0,'COMMA',0,'POINT')}">0</span>
+          / <span th:text="${item.producto?.unidad ?: 'kg'}">kg</span>
+        </div>
+
+        <!-- Cantidad -->
+        <div class="qty-control">
+          <button class="qty-btn"
+                  th:onclick="'cambiarCantidad(' + ${item.producto?.id} + ', -1)'"
+                  title="Quitar uno">−</button>
+          <span class="qty-num"
+                th:id="'qty-' + ${item.producto?.id}"
+                th:text="${item.cantidad}">1</span>
+          <button class="qty-btn"
+                  th:onclick="'cambiarCantidad(' + ${item.producto?.id} + ', 1)'"
+                  title="Agregar uno">+</button>
+        </div>
+      </div>
+
+      <!-- Precio línea -->
+      <div class="carrito-item-precio"
+           th:id="'precio-' + ${item.producto?.id}">
+        $<span th:text="${#numbers.formatDecimal((item.producto?.precio ?: 0) * item.cantidad, 0,'COMMA',0,'POINT')}">0</span>
+      </div>
+
+      <!-- Eliminar -->
+      <button class="btn-eliminar"
+              th:onclick="'eliminarItem(' + ${item.producto?.id} + ')'"
+              title="Eliminar del carrito">✕</button>
+
+    </div>
+
+    <!-- Link seguir comprando -->
+    <a th:href="@{/productos}"
+       style="display:inline-flex;align-items:center;gap:6px;color:var(--verde-suave);font-size:0.88rem;font-weight:600;margin-top:8px;border-bottom:1.5px solid transparent;transition:border-color 0.2s;"
+       onmouseover="this.style.borderColor='var(--verde-suave)'"
+       onmouseout="this.style.borderColor='transparent'">
+      ← Seguir comprando
+    </a>
+  </div>
+
+  <!-- ─── RESUMEN ─── -->
+  <div>
+    <div class="resumen-card">
+      <h3>Resumen del pedido</h3>
+
+      <div class="resumen-linea">
+        <span>Subtotal
+          (<span th:text="${itemsCarrito.size()}">0</span> productos)</span>
+        <span>$<span id="subtotalDisplay"
+                     th:text="${#numbers.formatDecimal(subtotal ?: 0, 0,'COMMA',0,'POINT')}">0</span></span>
+      </div>
+      <div class="resumen-linea">
+        <span>Envío</span>
+        <span th:if="${envio != null and envio > 0}"
+              th:text="'$' + ${#numbers.formatDecimal(envio,0,'COMMA',0,'POINT')}">$0</span>
+        <span th:unless="${envio != null and envio > 0}"
+              style="color:var(--verde-suave);font-weight:600;">A calcular</span>
+      </div>
+      <div class="resumen-linea">
+        <span>Descuento</span>
+        <span style="color:var(--verde-suave);">
+          -$<span th:text="${#numbers.formatDecimal(descuento ?: 0, 0,'COMMA',0,'POINT')}">0</span>
+        </span>
+      </div>
+
+      <div class="resumen-linea total">
+        <span>Total</span>
+        <span>$<span id="totalDisplay"
+                     th:text="${#numbers.formatDecimal(total ?: subtotal ?: 0, 0,'COMMA',0,'POINT')}">0</span></span>
+      </div>
+
+      <!-- Cupón -->
+      <div style="margin:16px 0;">
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="cuponInput" placeholder="Código de cupón"
+                 style="flex:1;border:1.5px solid var(--borde);border-radius:var(--radio-sm);padding:9px 12px;font-size:0.85rem;font-family:'DM Sans',sans-serif;outline:none;"/>
+          <button onclick="aplicarCupon()"
+                  style="background:var(--crema);border:1.5px solid var(--borde);border-radius:var(--radio-sm);padding:9px 14px;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--texto-oscuro);transition:all 0.2s;"
+                  onmouseover="this.style.borderColor='var(--verde-suave)'"
+                  onmouseout="this.style.borderColor='var(--borde)'">
+            Aplicar
+          </button>
+        </div>
+      </div>
+
+      <!-- Botón checkout -->
+      <a th:href="@{/checkout}" class="btn-primary" style="width:100%;justify-content:center;display:flex;text-decoration:none;margin-top:8px;">
+        Proceder al pago →
+      </a>
+
+      <!-- Métodos de pago -->
+      <div style="text-align:center;margin-top:14px;">
+        <p style="font-size:0.75rem;color:var(--texto-gris);margin-bottom:8px;">Pagos seguros con</p>
+        <div style="display:flex;justify-content:center;gap:10px;font-size:1.4rem;">
+          <span title="Nequi">💜</span>
+          <span title="PSE">🏦</span>
+          <span title="Daviplata">🔴</span>
+          <span title="Efecty">💵</span>
+        </div>
+      </div>
+
+      <!-- Confianza -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;font-size:0.78rem;color:var(--texto-gris);">
+        <span>🔒</span> Compra 100% segura
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer" style="margin-top:48px;">
+  <div class="footer-bottom" style="max-width:1280px;margin:0 auto;padding:20px 24px;">
+    <p>© 2025 <span>MATTA</span> — Lo natural es lo real</p>
+    <p>Hecho con 💚 en Colombia</p>
+  </div>
+</footer>
+
+<script>
+  function buscar() {
+    const q = document.getElementById('searchInput').value.trim();
+    if (q) window.location.href = '/productos?q=' + encodeURIComponent(q);
+  }
+
+  function cambiarCantidad(productoId, delta) {
+    fetch('/carrito/actualizar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `productoId=${productoId}&delta=${delta}`
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.eliminado) {
+        document.getElementById('item-' + productoId)?.remove();
+      } else {
+        document.getElementById('qty-' + productoId).textContent = data.cantidad;
+        document.getElementById('precio-' + productoId).innerHTML =
+          '$<span>' + data.precioLinea.toLocaleString('es-CO') + '</span>';
+      }
+      // Actualizar totales
+      if (data.subtotal !== undefined) {
+        document.getElementById('subtotalDisplay').textContent = data.subtotal.toLocaleString('es-CO');
+        document.getElementById('totalDisplay').textContent    = data.total.toLocaleString('es-CO');
+      }
+      // Badge navbar
+      const badge = document.querySelector('.cart-badge');
+      if (badge && data.totalItems !== undefined) badge.textContent = data.totalItems;
+    })
+    .catch(() => window.location.reload());
+  }
+
+  function eliminarItem(productoId) {
+    if (!confirm('¿Quitar este producto del carrito?')) return;
+    fetch('/carrito/eliminar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `productoId=${productoId}`
+    }).then(() => window.location.reload());
+  }
+
+  function aplicarCupon() {
+    const codigo = document.getElementById('cuponInput').value.trim();
+    if (!codigo) return;
+    fetch('/carrito/cupon', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `codigo=${encodeURIComponent(codigo)}`
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.valido) {
+        alert('✅ Cupón aplicado: ' + data.mensaje);
+        window.location.reload();
+      } else {
+        alert('⚠️ ' + (data.mensaje || 'Cupón no válido'));
+      }
+    });
+  }
+</script>
+
+</body>
+</html>

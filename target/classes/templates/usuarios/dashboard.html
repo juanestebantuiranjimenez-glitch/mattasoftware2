@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mi Panel — MATTA</title>
+  <link rel="stylesheet" th:href="@{/css/matta.css}"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a th:href="@{/}" class="navbar-logo">🌿 MATTA</a>
+    <div style="flex:1;"></div>
+    <nav class="navbar-nav">
+      <a th:href="@{/}" class="nav-link">Ir a la tienda</a>
+      <span style="color:rgba(245,240,220,0.5);font-size:0.85rem;"
+            th:text="${session.usuario?.nombre ?: 'Usuario'}">Nombre</span>
+      <a th:href="@{/logout}" class="nav-btn">Salir</a>
+    </nav>
+  </div>
+</nav>
+
+<!-- DASHBOARD LAYOUT -->
+<div class="dashboard">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-perfil">
+      <div class="sidebar-avatar">👨‍🌾</div>
+      <div class="sidebar-nombre" th:text="${session.usuario?.nombre ?: 'Campesino'}">Nombre</div>
+      <div class="sidebar-rol"    th:text="${session.usuario?.tipo ?: 'CAMPESINO'}">CAMPESINO</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a th:href="@{/dashboard}"          class="active" id="nav-inicio">
+        <span class="icon">📊</span> Resumen
+      </a>
+      <a th:href="@{/dashboard/productos}" id="nav-productos">
+        <span class="icon">🥬</span> Mis productos
+      </a>
+      <a th:href="@{/dashboard/pedidos}"   id="nav-pedidos">
+        <span class="icon">📦</span> Pedidos
+        <th:block th:if="${pedidosPendientes != null and pedidosPendientes > 0}">
+          <span style="margin-left:auto;background:#e53e3e;color:white;font-size:0.68rem;font-weight:700;padding:2px 7px;border-radius:100px;"
+                th:text="${pedidosPendientes}">0</span>
+        </th:block>
+      </a>
+      <a th:href="@{/dashboard/perfil}"    id="nav-perfil">
+        <span class="icon">👤</span> Mi perfil
+      </a>
+      <a th:href="@{/dashboard/ganancias}" id="nav-ganancias">
+        <span class="icon">💰</span> Ganancias
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ═══ CONTENIDO PRINCIPAL ═══ -->
+  <main class="dashboard-main">
+
+    <!-- Header -->
+    <div class="dashboard-header">
+      <h1>Buen día, <span th:text="${session.usuario?.nombre?.split(' ')[0] ?: 'Campesino'}">Nombre</span> 👋</h1>
+      <p>Así van tus ventas hoy — <span th:text="${#dates.format(#dates.createNow(),'d MMM yyyy')}">hoy</span></p>
+    </div>
+
+    <!-- Mensajes -->
+    <div th:if="${mensaje}"
+         style="background:#d1fae5;color:#065f46;border-radius:var(--radio-sm);padding:12px 16px;font-size:0.88rem;margin-bottom:20px;">
+      ✅ <span th:text="${mensaje}">Mensaje</span>
+    </div>
+    <div th:if="${error}"
+         style="background:#fee2e2;color:#b91c1c;border-radius:var(--radio-sm);padding:12px 16px;font-size:0.88rem;margin-bottom:20px;">
+      ⚠️ <span th:text="${error}">Error</span>
+    </div>
+
+    <!-- ─── KPIs ─── -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon">📦</div>
+        <div class="kpi-valor" th:text="${totalPedidos ?: 0}">0</div>
+        <div class="kpi-label">Pedidos totales</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">⏳</div>
+        <div class="kpi-valor" th:text="${pedidosPendientes ?: 0}">0</div>
+        <div class="kpi-label">Pendientes</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">🥬</div>
+        <div class="kpi-valor" th:text="${totalProductos ?: 0}">0</div>
+        <div class="kpi-label">Mis productos</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-valor">
+          $<span th:text="${#numbers.formatDecimal(gananciasMes ?: 0, 0,'COMMA',0,'POINT')}">0</span>
+        </div>
+        <div class="kpi-label">Ganancias este mes</div>
+      </div>
+    </div>
+
+    <!-- ─── PEDIDOS RECIENTES ─── -->
+    <div class="table-container">
+      <div class="table-header">
+        <h3>📦 Pedidos recientes</h3>
+        <a th:href="@{/dashboard/pedidos}"
+           style="font-size:0.83rem;color:var(--verde-suave);font-weight:600;">
+          Ver todos →
+        </a>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>N° Pedido</th>
+            <th>Cliente</th>
+            <th>Productos</th>
+            <th>Total</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <th:block th:if="${pedidosRecientes != null and !pedidosRecientes.isEmpty()}">
+            <tr th:each="pedido : ${pedidosRecientes}">
+              <td><strong th:text="'#' + ${pedido.id}">#001</strong></td>
+              <td th:text="${pedido.comprador?.nombre ?: 'Cliente'}">Cliente</td>
+              <td th:text="${pedido.cantidadItems ?: 1}">1</td>
+              <td>$<span th:text="${#numbers.formatDecimal(pedido.total ?: 0,0,'COMMA',0,'POINT')}">0</span></td>
+              <td th:text="${#dates.format(pedido.fecha,'dd/MM/yy')}">01/01/25</td>
+              <td>
+                <span class="badge-estado"
+                      th:classappend="${pedido.estado == 'PENDIENTE'  ? 'badge-pendiente'  :
+                                       pedido.estado == 'ENVIADO'    ? 'badge-enviado'    :
+                                       pedido.estado == 'ENTREGADO'  ? 'badge-entregado'  : 'badge-cancelado'}"
+                      th:text="${pedido.estado}">PENDIENTE</span>
+              </td>
+              <td>
+                <a th:href="@{/dashboard/pedidos/{id}(id=${pedido.id})}"
+                   style="color:var(--verde-suave);font-size:0.83rem;font-weight:600;">
+                  Ver
+                </a>
+              </td>
+            </tr>
+          </th:block>
+
+          <!-- Sin pedidos aún -->
+          <tr th:unless="${pedidosRecientes != null and !pedidosRecientes.isEmpty()}">
+            <td colspan="7" style="text-align:center;color:var(--texto-gris);padding:32px;">
+              Aún no tienes pedidos. <a th:href="@{/dashboard/productos}" style="color:var(--verde-suave);font-weight:600;">¡Publica tu primer producto!</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ─── MIS PRODUCTOS ─── -->
+    <div class="table-container">
+      <div class="table-header">
+        <h3>🥬 Mis productos</h3>
+        <a th:href="@{/dashboard/productos/nuevo}"
+           style="background:var(--verde-lima);color:var(--verde-oscuro);padding:7px 16px;border-radius:var(--radio-pill);font-size:0.82rem;font-weight:700;">
+          + Publicar producto
+        </a>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <th:block th:if="${misProductos != null and !misProductos.isEmpty()}">
+            <tr th:each="prod : ${misProductos}">
+              <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div style="width:36px;height:36px;background:linear-gradient(135deg,#e8f5c8,#d4e8a0);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">
+                    <span th:text="${prod.icono ?: '🥬'}">🥬</span>
+                  </div>
+                  <span th:text="${prod.nombre}" style="font-weight:500;">Producto</span>
+                </div>
+              </td>
+              <td th:text="${prod.categoria?.nombre ?: '—'}">Cat</td>
+              <td>$<span th:text="${#numbers.formatDecimal(prod.precio,0,'COMMA',0,'POINT')}">0</span></td>
+              <td>
+                <span th:text="${prod.cantidadDisponible + ' ' + (prod.unidad ?: 'kg')}"
+                      th:style="${prod.cantidadDisponible < 5 ? 'color:#d97706;font-weight:600;' : ''}">
+                  0 kg
+                </span>
+              </td>
+              <td>
+                <span class="badge-estado"
+                      th:classappend="${prod.activo ? 'badge-entregado' : 'badge-cancelado'}"
+                      th:text="${prod.activo ? 'Activo' : 'Inactivo'}">Activo</span>
+              </td>
+              <td>
+                <div style="display:flex;gap:8px;">
+                  <a th:href="@{/dashboard/productos/{id}/editar(id=${prod.id})}"
+                     style="color:var(--verde-suave);font-size:0.83rem;font-weight:600;">Editar</a>
+                  <span style="color:var(--borde);">|</span>
+                  <a th:href="@{/productos/{id}(id=${prod.id})}"
+                     style="color:var(--texto-gris);font-size:0.83rem;">Ver</a>
+                </div>
+              </td>
+            </tr>
+          </th:block>
+          <tr th:unless="${misProductos != null and !misProductos.isEmpty()}">
+            <td colspan="6" style="text-align:center;color:var(--texto-gris);padding:32px;">
+              No has publicado productos aún.
+              <a th:href="@{/dashboard/productos/nuevo}" style="color:var(--verde-suave);font-weight:600;">
+                Publicar mi primer producto →
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ─── FORMULARIO NUEVO PRODUCTO (inline) ─── -->
+    <div id="form-nuevo-producto" style="display:none;">
+      <div class="form-card">
+        <h3>➕ Publicar nuevo producto</h3>
+        <form th:action="@{/dashboard/productos/nuevo}" method="post"
+              enctype="multipart/form-data">
+          <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre del producto *</label>
+              <input type="text" name="nombre" placeholder="Ej: Tomate Chonto" required/>
+            </div>
+            <div class="form-group">
+              <label>Categoría *</label>
+              <select name="categoriaId" required>
+                <option value="">Seleccionar…</option>
+                <th:block th:each="cat : ${categorias}">
+                  <option th:value="${cat.id}"
+                          th:text="${cat.icono + ' ' + cat.nombre}">Categoría</option>
+                </th:block>
+                <!-- Fallback -->
+                <th:block th:unless="${categorias != null and !categorias.isEmpty()}">
+                  <option value="1">🍎 Frutas</option>
+                  <option value="2">🥦 Verduras</option>
+                  <option value="3">☕ Café</option>
+                  <option value="4">🌾 Granos</option>
+                  <option value="5">🥔 Tubérculos</option>
+                </th:block>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Precio (COP) *</label>
+              <input type="number" name="precio" placeholder="Ej: 3500" min="0" step="100" required/>
+            </div>
+            <div class="form-group">
+              <label>Unidad de venta *</label>
+              <select name="unidad" required>
+                <option value="kg">Kilogramo (kg)</option>
+                <option value="lb">Libra (lb)</option>
+                <option value="und">Unidad</option>
+                <option value="arroba">Arroba</option>
+                <option value="bulto">Bulto</option>
+                <option value="bolsa">Bolsa</option>
+                <option value="litro">Litro</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Cantidad disponible *</label>
+              <input type="number" name="cantidadDisponible" placeholder="Ej: 50" min="0" required/>
+            </div>
+            <div class="form-group">
+              <label>Emoji (ícono)</label>
+              <input type="text" name="icono" placeholder="🥬" maxlength="2"/>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea name="descripcion" rows="3"
+                      placeholder="Describe tu producto: variedad, cómo se cultiva, sabor, usos…"
+                      style="resize:vertical;"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Foto del producto</label>
+            <div class="upload-area" onclick="document.getElementById('foto-input').click();">
+              <div class="upload-icon">📷</div>
+              <p>Haz clic para subir una foto</p>
+              <p style="font-size:0.75rem;margin-top:4px;">JPG, PNG · máximo 5 MB</p>
+              <input type="file" id="foto-input" name="imagen"
+                     accept="image/*" style="display:none;"
+                     onchange="mostrarNombreFoto(this)"/>
+            </div>
+            <p id="nombre-foto" style="font-size:0.8rem;color:var(--verde-suave);margin-top:6px;"></p>
+          </div>
+
+          <div style="display:flex;gap:12px;margin-top:8px;">
+            <button type="submit" class="btn-primary">✅ Publicar producto</button>
+            <button type="button" class="btn-secondary"
+                    onclick="document.getElementById('form-nuevo-producto').style.display='none'">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Botón flotante para mostrar el form -->
+    <div style="text-align:center;margin-top:8px;" id="btn-toggle-form">
+      <button class="btn-primary"
+              onclick="toggleFormProducto()">
+        ➕ Publicar nuevo producto
+      </button>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function toggleFormProducto() {
+    const form = document.getElementById('form-nuevo-producto');
+    const btn  = document.getElementById('btn-toggle-form');
+    if (form.style.display === 'none') {
+      form.style.display = 'block';
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      btn.style.display = 'none';
+    } else {
+      form.style.display = 'none';
+      btn.style.display = 'block';
+    }
+  }
+
+  function mostrarNombreFoto(input) {
+    const p = document.getElementById('nombre-foto');
+    if (input.files && input.files[0]) {
+      p.textContent = '📎 ' + input.files[0].name;
+    }
+  }
+
+  // Marcar nav activo según URL
+  const path = window.location.pathname;
+  if (path.includes('/pedidos'))   document.getElementById('nav-pedidos')?.classList.add('active');
+  if (path.includes('/productos')) document.getElementById('nav-productos')?.classList.add('active');
+  if (path.includes('/perfil'))    document.getElementById('nav-perfil')?.classList.add('active');
+  if (path.includes('/ganancias')) document.getElementById('nav-ganancias')?.classList.add('active');
+</script>
+
+</body>
+</html>

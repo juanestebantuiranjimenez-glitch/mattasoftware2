@@ -1,40 +1,204 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Login - MATTA</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ingresar — MATTA</title>
+  <link rel="stylesheet" th:href="@{/css/matta.css}"/>
 </head>
-<body class="bg-light">
-    <div th:replace="~{fragments/navbar :: navbar}"></div>
-    <div class="container mt-5">
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-4">
-                <div class="card shadow">
-                    <div class="card-body">
-                        <h2 class="text-center mb-4">Iniciar Sesión</h2>
-                        
-                        <!-- Mensaje de error si el login falla -->
-                        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+<body>
 
-                        <form th:action="@{/usuarios/login}" method="post">
-                            <div class="mb-3">
-                                <label class="form-label">Correo electrónico</label>
-                                <input type="email" name="correo" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Contraseña</label>
-                                <input type="password" name="contrasena" class="form-control" required>
-                            </div>
-                            <button type="submit" class="btn btn-success w-100">Entrar</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="auth-page">
+
+  <div class="auth-card">
+
+    <!-- Logo -->
+    <div class="auth-logo">
+      <a th:href="@{/}" style="display:inline-block;">
+        <div class="logo-text">🌿 MATTA</div>
+      </a>
+      <p>Lo natural es lo real</p>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Tabs login / registro -->
+    <div class="auth-tabs">
+      <button class="auth-tab" id="tab-login"    onclick="showTab('login')">Ingresar</button>
+      <button class="auth-tab" id="tab-registro" onclick="showTab('registro')">Registrarse</button>
+    </div>
+
+    <!-- ─── FORMULARIO LOGIN ─── -->
+    <div id="form-login">
+
+      <!-- Mensaje de error del backend -->
+      <div th:if="${errorLogin}"
+           style="background:#fee2e2;color:#b91c1c;border-radius:8px;padding:10px 14px;font-size:0.85rem;margin-bottom:16px;">
+        ⚠️ <span th:text="${errorLogin}">Correo o contraseña incorrectos</span>
+      </div>
+
+      <!-- Mensaje de éxito (ej: registro exitoso) -->
+      <div th:if="${mensajeExito}"
+           style="background:#d1fae5;color:#065f46;border-radius:8px;padding:10px 14px;font-size:0.85rem;margin-bottom:16px;">
+        ✅ <span th:text="${mensajeExito}">¡Registro exitoso!</span>
+      </div>
+
+      <form th:action="@{/login}" method="post">
+        <!-- CSRF Token de Spring Security (si lo usas) -->
+        <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+        <div class="form-group">
+          <label for="correo-login">Correo electrónico</label>
+          <input type="email" id="correo-login" name="correo"
+                 placeholder="tucorreo@email.com" required autocomplete="email"/>
+        </div>
+
+        <div class="form-group">
+          <label for="password-login">Contraseña</label>
+          <input type="password" id="password-login" name="password"
+                 placeholder="Tu contraseña" required autocomplete="current-password"/>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
+          <a th:href="@{/recuperar-clave}"
+             style="font-size:0.82rem;color:var(--verde-suave);font-weight:500;">
+            ¿Olvidaste tu contraseña?
+          </a>
+        </div>
+
+        <button type="submit" class="btn-full">Ingresar a MATTA</button>
+      </form>
+
+      <p style="text-align:center;margin-top:18px;font-size:0.85rem;color:var(--texto-gris);">
+        ¿No tienes cuenta?
+        <a href="#" onclick="showTab('registro')"
+           style="color:var(--verde-suave);font-weight:600;">Regístrate gratis</a>
+      </p>
+    </div>
+
+    <!-- ─── FORMULARIO REGISTRO ─── -->
+    <div id="form-registro" style="display:none;">
+
+      <div th:if="${errorRegistro}"
+           style="background:#fee2e2;color:#b91c1c;border-radius:8px;padding:10px 14px;font-size:0.85rem;margin-bottom:16px;">
+        ⚠️ <span th:text="${errorRegistro}">Error al registrarse</span>
+      </div>
+
+      <!-- Tipo de usuario -->
+      <p style="font-size:0.83rem;font-weight:600;margin-bottom:10px;color:var(--texto-oscuro);">
+        ¿Cómo quieres usar MATTA?
+      </p>
+      <div class="tipo-usuario" id="tipo-selector">
+        <div class="tipo-btn" id="tipo-cliente"    onclick="seleccionarTipo('CLIENTE')">
+          <span class="tipo-icon">🛒</span> Comprador
+        </div>
+        <div class="tipo-btn" id="tipo-campesino"  onclick="seleccionarTipo('CAMPESINO')">
+          <span class="tipo-icon">👨‍🌾</span> Campesino / Vendedor
+        </div>
+      </div>
+
+      <form th:action="@{/registro}" method="post" id="form-reg">
+        <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <input type="hidden" id="tipo-usuario-input" name="tipo" value="CLIENTE"/>
+
+        <div class="form-group">
+          <label for="nombre-reg">Nombre completo</label>
+          <input type="text" id="nombre-reg" name="nombre"
+                 placeholder="Juan Esteban Tuitán" required autocomplete="name"/>
+        </div>
+
+        <div class="form-group">
+          <label for="correo-reg">Correo electrónico</label>
+          <input type="email" id="correo-reg" name="correo"
+                 placeholder="tucorreo@email.com" required autocomplete="email"/>
+        </div>
+
+        <div class="form-group">
+          <label for="telefono-reg">Teléfono</label>
+          <input type="tel" id="telefono-reg" name="telefono"
+                 placeholder="300 123 4567" autocomplete="tel"/>
+        </div>
+
+        <!-- Campo extra solo para campesinos -->
+        <div id="campo-ubicacion" style="display:none;">
+          <div class="form-group">
+            <label for="ubicacion-reg">Municipio / Vereda</label>
+            <input type="text" id="ubicacion-reg" name="ubicacion"
+                   placeholder="Pereira, Risaralda"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password-reg">Contraseña</label>
+          <input type="password" id="password-reg" name="password"
+                 placeholder="Mínimo 6 caracteres" required
+                 minlength="6" autocomplete="new-password"/>
+        </div>
+
+        <div class="form-group">
+          <label for="password2-reg">Confirmar contraseña</label>
+          <input type="password" id="password2-reg" name="password2"
+                 placeholder="Repite tu contraseña" required autocomplete="new-password"/>
+        </div>
+
+        <div id="error-password"
+             style="display:none;color:#b91c1c;font-size:0.8rem;margin-bottom:12px;">
+          ⚠️ Las contraseñas no coinciden
+        </div>
+
+        <button type="button" class="btn-full" onclick="validarYEnviar()">
+          Crear mi cuenta gratis
+        </button>
+      </form>
+
+      <p style="text-align:center;margin-top:18px;font-size:0.85rem;color:var(--texto-gris);">
+        ¿Ya tienes cuenta?
+        <a href="#" onclick="showTab('login')"
+           style="color:var(--verde-suave);font-weight:600;">Ingresar</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Mostrar la pestaña correcta al cargar
+  // Si hay errorRegistro o param=registro en URL, abrir tab registro
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const tieneErrorReg = document.querySelector('[th\\:if="${errorRegistro}"]');
+    if (params.get('tab') === 'registro') showTab('registro');
+    else showTab('login');
+  })();
+
+  function showTab(tab) {
+    document.getElementById('form-login').style.display    = tab === 'login'    ? 'block' : 'none';
+    document.getElementById('form-registro').style.display = tab === 'registro' ? 'block' : 'none';
+    document.getElementById('tab-login').classList.toggle('active',    tab === 'login');
+    document.getElementById('tab-registro').classList.toggle('active', tab === 'registro');
+  }
+
+  function seleccionarTipo(tipo) {
+    document.getElementById('tipo-usuario-input').value = tipo;
+    document.getElementById('tipo-cliente').classList.toggle('selected',   tipo === 'CLIENTE');
+    document.getElementById('tipo-campesino').classList.toggle('selected', tipo === 'CAMPESINO');
+    document.getElementById('campo-ubicacion').style.display = tipo === 'CAMPESINO' ? 'block' : 'none';
+    document.getElementById('ubicacion-reg').required = tipo === 'CAMPESINO';
+  }
+
+  function validarYEnviar() {
+    const p1 = document.getElementById('password-reg').value;
+    const p2 = document.getElementById('password2-reg').value;
+    const err = document.getElementById('error-password');
+    if (p1 !== p2) {
+      err.style.display = 'block';
+      return;
+    }
+    err.style.display = 'none';
+    document.getElementById('form-reg').submit();
+  }
+
+  // Activar tipo CLIENTE por defecto
+  seleccionarTipo('CLIENTE');
+</script>
+
 </body>
 </html>
