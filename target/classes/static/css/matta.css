@@ -1205,3 +1205,252 @@ tr:hover td { background: #f8fbf0; }
   margin-right: 5px;
   animation: pulse-dot 1.5s infinite;
 }
+/* ═══════════════════════════════════════════════
+   NAVBAR FRAGMENTO — clases matta-*
+   ════════════════════════════════════════════ */
+:root {
+  --matta-oscuro: #1a2a08;
+  --matta-lima:   #c8e03a;
+  --matta-crema:  #f5f0dc;
+}
+
+.matta-navbar {
+  background: #1a2a08;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.28);
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+}
+.matta-navbar-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 66px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.matta-logo {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: #c8e03a;
+  text-decoration: none;
+  letter-spacing: -0.5px;
+  flex-shrink: 0;
+  transition: opacity 0.2s;
+}
+.matta-logo:hover { opacity: 0.85; }
+
+.matta-search {
+  flex: 1;
+  max-width: 440px;
+  display: flex;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(200,224,58,0.22);
+  border-radius: 100px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.matta-search:focus-within { border-color: #c8e03a; }
+.matta-search input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #f5f0dc;
+  padding: 10px 16px;
+  font-size: 0.88rem;
+  font-family: inherit;
+}
+.matta-search input::placeholder { color: rgba(245,240,220,0.4); }
+.matta-search button {
+  background: #c8e03a;
+  border: none;
+  padding: 0 16px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #1a2a08;
+  font-weight: 700;
+  transition: background 0.2s;
+}
+.matta-search button:hover { background: #d9f04a; }
+
+.matta-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+.matta-nav-link {
+  color: rgba(245,240,220,0.78);
+  text-decoration: none;
+  padding: 8px 13px;
+  border-radius: 100px;
+  font-size: 0.87rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.matta-nav-link:hover {
+  color: #c8e03a;
+  background: rgba(200,224,58,0.1);
+}
+.matta-nav-btn {
+  background: #c8e03a;
+  color: #1a2a08 !important;
+  text-decoration: none;
+  padding: 9px 18px;
+  border-radius: 100px;
+  font-size: 0.87rem;
+  font-weight: 700;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.matta-nav-btn:hover {
+  background: #d9f04a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(200,224,58,0.35);
+}
+.matta-nav-btn-out {
+  color: rgba(245,240,220,0.6);
+  text-decoration: none;
+  padding: 8px 13px;
+  border-radius: 100px;
+  font-size: 0.87rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: 1px solid rgba(245,240,220,0.2);
+}
+.matta-nav-btn-out:hover { color: #fc8181; border-color: #fc8181; }
+
+.matta-nav-carrito {
+  position: relative;
+  color: rgba(245,240,220,0.82);
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 100px;
+  font-size: 1.15rem;
+  transition: all 0.2s;
+}
+.matta-nav-carrito:hover { color: #c8e03a; }
+.matta-cart-badge {
+  position: absolute;
+  top: 1px; right: 1px;
+  background: #e53e3e;
+  color: white;
+  font-size: 0.62rem;
+  font-weight: 700;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #1a2a08;
+}
+.matta-hamburger {
+  display: none;
+  background: none;
+  border: 1.5px solid rgba(200,224,58,0.3);
+  color: #c8e03a;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-left: auto;
+  transition: all 0.2s;
+}
+.matta-hamburger:hover { background: rgba(200,224,58,0.1); }
+
+.matta-mobile-menu {
+  display: none;
+  flex-direction: column;
+  background: #111f05;
+  padding: 12px 24px 18px;
+  border-top: 1px solid rgba(200,224,58,0.12);
+}
+.matta-mobile-menu a {
+  color: rgba(245,240,220,0.8);
+  text-decoration: none;
+  padding: 11px 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(200,224,58,0.08);
+  transition: color 0.2s;
+}
+.matta-mobile-menu a:hover { color: #c8e03a; }
+.matta-mobile-menu a:last-child { border-bottom: none; }
+
+/* ═══════════════════════════════════════════════
+   FOOTER FRAGMENTO — clases matta-footer-*
+   ════════════════════════════════════════════ */
+.matta-footer {
+  background: #1a2a08;
+  color: rgba(245,240,220,0.65);
+  padding: 52px 24px 0;
+  margin-top: 64px;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+}
+.matta-footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 40px;
+  padding-bottom: 40px;
+}
+.matta-footer-logo {
+  font-family: Georgia, serif;
+  font-size: 1.55rem;
+  font-weight: 900;
+  color: #c8e03a;
+  margin-bottom: 14px;
+}
+.matta-footer-brand p {
+  font-size: 0.85rem;
+  line-height: 1.75;
+}
+.matta-footer-col h4 {
+  color: #f5f0dc;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 16px;
+}
+.matta-footer-col ul { list-style: none; padding: 0; margin: 0; }
+.matta-footer-col li { margin-bottom: 9px; }
+.matta-footer-col a {
+  color: rgba(245,240,220,0.6);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+}
+.matta-footer-col a:hover { color: #c8e03a; }
+
+.matta-footer-bottom {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px 0 24px;
+  border-top: 1px solid rgba(200,224,58,0.13);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.8rem;
+}
+.matta-footer-bottom span { color: #c8e03a; font-weight: 700; }
+
+@media (max-width: 900px) {
+  .matta-footer-inner { grid-template-columns: 1fr 1fr; gap: 28px; }
+}
+@media (max-width: 768px) {
+  .matta-search    { display: none; }
+  .matta-nav-links { display: none; }
+  .matta-hamburger { display: block; }
+  .matta-mobile-menu.open { display: flex; }
+  .matta-footer-inner { grid-template-columns: 1fr; }
+  .matta-footer-bottom { flex-direction: column; text-align: center; }
+}

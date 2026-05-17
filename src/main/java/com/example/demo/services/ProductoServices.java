@@ -17,15 +17,18 @@ public class ProductoServices {
     }
 
     public Producto guardar(Producto producto) {
-        // REGLA DE NEGOCIO: No permitir productos con precio negativo
         if (producto.getPrecio() < 0) {
-            return null; 
+            return null;
         }
         return productoRepository.save(producto);
     }
 
-    // Método para buscar por ID (útil para ver detalles de un producto)
     public Producto buscarPorId(int id) {
         return productoRepository.findById(id).orElse(null);
     }
+
+    // Listar productos de un campesino para el dashboard
+    public List<Producto> listarPorUsuario(int idUsuario) {
+    return productoRepository.findByIdUsuario(idUsuario);
+}
 }

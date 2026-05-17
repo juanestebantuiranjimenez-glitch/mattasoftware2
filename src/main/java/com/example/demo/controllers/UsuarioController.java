@@ -2,55 +2,103 @@ package com.example.demo.controllers;
 
 import com.example.demo.models.Usuarios;
 import com.example.demo.services.UsuarioServices;
+import com.example.demo.services.ProductoServices;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller; // CAMBIO: @Controller
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpSession;
 
-@Controller // CAMBIO: Quitamos @RestController
+@Controller
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
     @Autowired
     private UsuarioServices usuarioService;
 
-    // 1. Muestra la página de login
+    @Autowired
+    private ProductoServices productoService;
+
+    // ── LOGIN ──────────────────────────────────────────
     @GetMapping("/login")
     public String mostrarLogin() {
         return "usuarios/login";
     }
 
-    
-
-    // 2. Procesa los datos del formulario
     @PostMapping("/login")
-    public String procesarLogin(@RequestParam String correo, 
-                               @RequestParam String contrasena, 
-                               Model model) {
-        
+    public String procesarLogin(@RequestParam String correo,
+                                @RequestParam String contrasena,
+                                HttpSession session,
+                                Model model) {
+
         Usuarios usuarioEncontrado = usuarioService.login(correo, contrasena);
 
         if (usuarioEncontrado != null) {
-            // Si el login es correcto, lo mandamos a la lista de productos
+            // Guardar usuario en sesión
+            session.setAttribute("usuario", usuarioEncontrado);
+            session.setAttribute("cantidadCarrito", 0);
+
+            // Si es campesino, va al dashboard; si es cliente, va a productos
+            if ("CAMPESINO".equalsIgnoreCase(usuarioEncontrado.getTipo_usuario())) {
+                return "redirect:/usuarios/dashboard";
+            }
             return "redirect:/productos/listar";
+
         } else {
-            // Si falla, volvemos al login con un mensaje de error
             model.addAttribute("error", "Correo o contraseña incorrectos");
             return "usuarios/login";
         }
     }
 
-    // Muestra la página de registro
+    // ── REGISTRO ───────────────────────────────────────
     @GetMapping("/registro")
     public String mostrarRegistro() {
-    return "usuarios/registro";
-}
-    // Guarda al nuevo usuario
+        return "usuarios/registro";
+    }
+
     @PostMapping("/registro")
-    public String guardarRegistro(@ModelAttribute Usuarios usuario) {
+    public String guardarRegistro(@ModelAttribute Usuarios usuario,
+                                  HttpSession session,
+                                  Model model) {
+        // Verificar si el correo ya existe
+        if (usuarioService.existeCorreo(usuario.getCorreo())) {
+            model.addAttribute("error", "Ya existe una cuenta con ese correo");
+            return "usuarios/registro";
+        }
 
-         usuarioService.guardarUsuario(usuario);
+        usuarioService.guardarUsuario(usuario);
 
-         return "redirect:/usuarios/login"; // Después de registrarse, lo manda al login
-}
+        // Login automático después del registro
+        session.setAttribute("usuario", usuario);
+        session.setAttribute("cantidadCarrito", 0);
+
+        if ("CAMPESINO".equalsIgnoreCase(usuario.getTipo_usuario())) {
+            return "redirect:/usuarios/dashboard";
+        }
+        return "redirect:/productos/listar";
+    }
+
+    // ── DASHBOARD ──────────────────────────────────────
+    @GetMapping("/dashboard")
+    public String dashboard(HttpSession session, Model model) {
+        Usuarios usuario = (Usuarios) session.getAttribute("usuario");
+
+        // Si no está logueado, mandarlo al login
+        if (usuario == null) {
+            return "redirect:/usuarios/login";
+        }
+
+        // Pasar datos al dashboard
+        model.addAttribute("misProductos",
+            productoService.listarPorUsuario(usuario.getId_usuario()));
+
+        return "usuarios/dashboard";
+    }
+
+    // ── LOGOUT ─────────────────────────────────────────
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/";
+    }
 }
