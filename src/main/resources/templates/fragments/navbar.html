@@ -7,9 +7,7 @@
   <div class="matta-navbar-inner">
 
     <!-- LOGO -->
-    <a th:href="@{/}" class="matta-logo">
-      🌿 MATTA
-    </a>
+    <a th:href="@{/}" class="matta-logo">🌿 MATTA</a>
 
     <!-- BUSCADOR -->
     <div class="matta-search">
@@ -17,293 +15,53 @@
       <button onclick="navBuscar()">🔍</button>
     </div>
 
-    <!-- LINKS -->
+    <!-- LINKS escritorio -->
     <nav class="matta-nav-links">
-      <a th:href="@{/productos}"   class="matta-nav-link">Productos</a>
-      <a th:href="@{/campesinos}"  class="matta-nav-link">Campesinos</a>
+      <a th:href="@{/productos/listar}" class="matta-nav-link">Productos</a>
 
-      <!-- Usuario logueado -->
+      <!-- Si está logueado -->
       <th:block th:if="${session.usuario != null}">
-        <a th:href="@{/carrito}" class="matta-nav-carrito" title="Mi carrito">
-          🛒
-          <span class="matta-cart-badge"
-                th:text="${session.cantidadCarrito != null ? session.cantidadCarrito : 0}">0</span>
-        </a>
-        <a th:href="@{/dashboard}" class="matta-nav-link">Mi Panel</a>
-        <a th:href="@{/logout}"    class="matta-nav-btn-out">Salir</a>
+        <a th:href="@{/usuarios/dashboard}" class="matta-nav-link">Mi Panel</a>
+        <a th:href="@{/usuarios/logout}"    class="matta-nav-btn-out">Salir</a>
       </th:block>
 
-      <!-- No logueado -->
+      <!-- Si NO está logueado -->
       <th:block th:unless="${session.usuario != null}">
-        <a th:href="@{/login}"    class="matta-nav-link">Ingresar</a>
-        <a th:href="@{/registro}" class="matta-nav-btn">Registrarse</a>
+        <a th:href="@{/usuarios/login}"    class="matta-nav-link">Ingresar</a>
+        <a th:href="@{/usuarios/registro}" class="matta-nav-btn">Registrarse</a>
       </th:block>
     </nav>
 
-    <!-- HAMBURGER móvil -->
-    <button class="matta-hamburger" onclick="toggleMobileMenu()" aria-label="Menú">
-      ☰
-    </button>
-
+    <!-- Botón hamburguesa móvil -->
+    <button class="matta-hamburger" onclick="toggleMobileMenu()" aria-label="Menú">☰</button>
   </div>
 
-  <!-- Menú móvil desplegable -->
+  <!-- Menú móvil -->
   <div class="matta-mobile-menu" id="mobileMenu">
-    <a th:href="@{/productos}">🥦 Productos</a>
-    <a th:href="@{/campesinos}">👨‍🌾 Campesinos</a>
+    <a th:href="@{/productos/listar}">🥦 Productos</a>
     <th:block th:if="${session.usuario != null}">
-      <a th:href="@{/carrito}">🛒 Mi carrito</a>
-      <a th:href="@{/dashboard}">📊 Mi panel</a>
-      <a th:href="@{/logout}">🚪 Salir</a>
+      <a th:href="@{/usuarios/dashboard}">📊 Mi panel</a>
+      <a th:href="@{/usuarios/logout}">🚪 Salir</a>
     </th:block>
     <th:block th:unless="${session.usuario != null}">
-      <a th:href="@{/login}">🔑 Ingresar</a>
-      <a th:href="@{/registro}" style="color:var(--matta-lima)!important;font-weight:700;">✅ Registrarse gratis</a>
+      <a th:href="@{/usuarios/login}">🔑 Ingresar</a>
+      <a th:href="@{/usuarios/registro}" style="color:var(--matta-lima)!important;font-weight:700;">✅ Registrarse gratis</a>
     </th:block>
   </div>
 </nav>
 
-<!-- ═══════════════════════════════
-     ESTILOS DEL NAVBAR
-     (solo se cargan con el fragmento)
-════════════════════════════════════ -->
-<style>
-  /* Variables de color MATTA */
-  :root {
-    --matta-oscuro:  #1a2a08;
-    --matta-medio:   #3d5c14;
-    --matta-lima:    #c8e03a;
-    --matta-suave:   #7aad2a;
-    --matta-crema:   #f5f0dc;
-    --matta-borde:   #d4e0a8;
-  }
-
-  /* ── NAVBAR BASE ── */
-  .matta-navbar {
-    background: var(--matta-oscuro);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.28);
-    font-family: 'DM Sans', 'Segoe UI', sans-serif;
-  }
-
-  .matta-navbar-inner {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 24px;
-    height: 66px;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-  }
-
-  /* ── LOGO ── */
-  .matta-logo {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 1.65rem;
-    font-weight: 900;
-    color: var(--matta-lima);
-    text-decoration: none;
-    letter-spacing: -0.5px;
-    flex-shrink: 0;
-    transition: opacity 0.2s;
-  }
-  .matta-logo:hover { opacity: 0.85; }
-
-  /* ── BUSCADOR ── */
-  .matta-search {
-    flex: 1;
-    max-width: 440px;
-    display: flex;
-    background: rgba(255,255,255,0.07);
-    border: 1.5px solid rgba(200,224,58,0.22);
-    border-radius: 100px;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-  .matta-search:focus-within {
-    border-color: var(--matta-lima);
-  }
-  .matta-search input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--matta-crema);
-    padding: 10px 16px;
-    font-size: 0.88rem;
-    font-family: inherit;
-  }
-  .matta-search input::placeholder {
-    color: rgba(245,240,220,0.4);
-  }
-  .matta-search button {
-    background: var(--matta-lima);
-    border: none;
-    padding: 0 16px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    color: var(--matta-oscuro);
-    font-weight: 700;
-    transition: background 0.2s;
-  }
-  .matta-search button:hover { background: #d9f04a; }
-
-  /* ── LINKS ── */
-  .matta-nav-links {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-left: auto;
-  }
-
-  .matta-nav-link {
-    color: rgba(245,240,220,0.78);
-    text-decoration: none;
-    padding: 8px 13px;
-    border-radius: 100px;
-    font-size: 0.87rem;
-    font-weight: 500;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .matta-nav-link:hover {
-    color: var(--matta-lima);
-    background: rgba(200,224,58,0.1);
-  }
-
-  /* Botón registrarse */
-  .matta-nav-btn {
-    background: var(--matta-lima);
-    color: var(--matta-oscuro) !important;
-    text-decoration: none;
-    padding: 9px 18px;
-    border-radius: 100px;
-    font-size: 0.87rem;
-    font-weight: 700;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .matta-nav-btn:hover {
-    background: #d9f04a;
-    box-shadow: 0 4px 14px rgba(200,224,58,0.35);
-    transform: translateY(-1px);
-  }
-
-  /* Botón salir */
-  .matta-nav-btn-out {
-    color: rgba(245,240,220,0.6);
-    text-decoration: none;
-    padding: 8px 13px;
-    border-radius: 100px;
-    font-size: 0.87rem;
-    font-weight: 500;
-    transition: all 0.2s;
-    border: 1px solid rgba(245,240,220,0.2);
-  }
-  .matta-nav-btn-out:hover {
-    color: #fc8181;
-    border-color: #fc8181;
-  }
-
-  /* Carrito */
-  .matta-nav-carrito {
-    position: relative;
-    color: rgba(245,240,220,0.82);
-    text-decoration: none;
-    padding: 8px 12px;
-    border-radius: 100px;
-    font-size: 1.15rem;
-    transition: all 0.2s;
-  }
-  .matta-nav-carrito:hover { color: var(--matta-lima); }
-
-  .matta-cart-badge {
-    position: absolute;
-    top: 1px; right: 1px;
-    background: #e53e3e;
-    color: white;
-    font-size: 0.62rem;
-    font-weight: 700;
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid var(--matta-oscuro);
-  }
-
-  /* ── HAMBURGER ── */
-  .matta-hamburger {
-    display: none;
-    background: none;
-    border: 1.5px solid rgba(200,224,58,0.3);
-    color: var(--matta-lima);
-    border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    margin-left: auto;
-    transition: all 0.2s;
-  }
-  .matta-hamburger:hover {
-    background: rgba(200,224,58,0.1);
-  }
-
-  /* ── MENÚ MÓVIL ── */
-  .matta-mobile-menu {
-    display: none;
-    flex-direction: column;
-    background: #111f05;
-    padding: 12px 24px 18px;
-    border-top: 1px solid rgba(200,224,58,0.12);
-  }
-  .matta-mobile-menu a {
-    color: rgba(245,240,220,0.8);
-    text-decoration: none;
-    padding: 11px 0;
-    font-size: 0.95rem;
-    font-weight: 500;
-    border-bottom: 1px solid rgba(200,224,58,0.08);
-    transition: color 0.2s;
-  }
-  .matta-mobile-menu a:hover { color: var(--matta-lima); }
-  .matta-mobile-menu a:last-child { border-bottom: none; }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 768px) {
-    .matta-search    { display: none; }
-    .matta-nav-links { display: none; }
-    .matta-hamburger { display: block; }
-    .matta-mobile-menu.open { display: flex; }
-  }
-</style>
-
 <script>
   function navBuscar() {
     const q = document.getElementById('navSearchInput')?.value.trim();
-    if (q) window.location.href = '/productos?q=' + encodeURIComponent(q);
+    if (q) window.location.href = '/productos/listar?q=' + encodeURIComponent(q);
   }
   document.addEventListener('DOMContentLoaded', function() {
     const inp = document.getElementById('navSearchInput');
     if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') navBuscar(); });
   });
-
   function toggleMobileMenu() {
     document.getElementById('mobileMenu')?.classList.toggle('open');
   }
-
-  // Marcar el link activo según la URL actual
-  document.addEventListener('DOMContentLoaded', function() {
-    const path = window.location.pathname;
-    document.querySelectorAll('.matta-nav-link').forEach(link => {
-      if (link.getAttribute('href') && path.startsWith(link.getAttribute('href')) && link.getAttribute('href') !== '/') {
-        link.style.color = 'var(--matta-lima)';
-        link.style.background = 'rgba(200,224,58,0.1)';
-      }
-    });
-  });
 </script>
 
 </body>

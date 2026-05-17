@@ -38,4 +38,7 @@ public class UsuarioServices {
         }
         return null; // Si algo falla, devolvemos nada
     }
+    public boolean existeCorreo(String correo) {
+    return usuarioRepository.findByCorreo(correo).isPresent();
+}
 }
