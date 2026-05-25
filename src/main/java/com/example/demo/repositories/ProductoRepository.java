@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto, Integer> {
 
-    @Query("SELECT p FROM Producto p WHERE p.id_usuario = :idUsuario")
+    @Query("SELECT p FROM Producto p WHERE p.usuario.id_usuario = :idUsuario")
     List<Producto> findByIdUsuario(@Param("idUsuario") int idUsuario);
 }

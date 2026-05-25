@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mi Panel — MATTA</title>
+  <link rel="stylesheet" th:href="@{/css/matta.css}"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a th:href="@{/}" class="navbar-logo">🌿 MATTA</a>
+    <div style="flex:1;"></div>
+    <nav class="navbar-nav">
+      <a th:href="@{/}" class="nav-link">Ir a la tienda</a>
+      <span style="color:rgba(245,240,220,0.5);font-size:0.85rem;"
+            th:text="${session.usuario?.nombre ?: 'Usuario'}">Nombre</span>
+      <a th:href="@{/logout}" class="nav-btn">Salir</a>
+    </nav>
+  </div>
+</nav>
+
+<!-- DASHBOARD LAYOUT -->
+<div class="dashboard">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-perfil">
+      <div class="sidebar-avatar">👤</div>
+      <div class="sidebar-nombre" th:text="${session.usuario?.nombre ?: 'Cliente'}">Nombre</div>
+      <div class="sidebar-rol"    th:text="${session.usuario?.rol ?: 'CLIENTE'}">CLIENTE</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a th:href="@{/dashboard-cliente}" class="active" id="nav-inicio">
+        <span class="icon">📊</span> Resumen
+      </a>
+      <a href="#pedidos-section" id="nav-pedidos">
+        <span class="icon">📦</span> Mis Compras
+      </a>
+      <a href="/usuarios/perfil" id="nav-perfil">
+        <span class="icon">👤</span> Mi perfil
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ═══ CONTENIDO PRINCIPAL ═══ -->
+  <main class="dashboard-main">
+
+    <!-- Header -->
+    <div class="dashboard-header">
+      <h1>Buen día, <span th:text="${session.usuario?.nombre?.split(' ')[0] ?: 'Cliente'}">Nombre</span> 👋</h1>
+      <p>Bienvenido a tu panel de cliente — <span th:text="${#dates.format(#dates.createNow(),'d MMM yyyy')}">hoy</span></p>
+    </div>
+
+    <!-- Mensajes -->
+    <div th:if="${mensaje}"
+         style="background:#d1fae5;color:#065f46;border-radius:var(--radio-sm);padding:12px 16px;font-size:0.88rem;margin-bottom:20px;">
+      ✅ <span th:text="${mensaje}">Mensaje</span>
+    </div>
+    <div th:if="${error}"
+         style="background:#fee2e2;color:#b91c1c;border-radius:var(--radio-sm);padding:12px 16px;font-size:0.88rem;margin-bottom:20px;">
+      ⚠️ <span th:text="${error}">Error</span>
+    </div>
+
+    <!-- ─── KPIs ─── -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon">📦</div>
+        <div class="kpi-valor" th:text="${totalCompras ?: 0}">0</div>
+        <div class="kpi-label">Compras totales</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">⏳</div>
+        <div class="kpi-valor" th:text="${comprasPendientes ?: 0}">0</div>
+        <div class="kpi-label">Compras en camino</div>
+      </div>
+    </div>
+
+    <!-- ─── PEDIDOS RECIENTES ─── -->
+    <div class="table-container">
+      <div class="table-header">
+        <h3>📦 Pedidos recientes</h3>
+        <a th:href="@{/dashboard/pedidos}"
+           style="font-size:0.83rem;color:var(--verde-suave);font-weight:600;">
+          Ver todos →
+        </a>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>N° Pedido</th>
+            <th>Cliente</th>
+            <th>Productos</th>
+            <th>Total</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <th:block th:if="${pedidosRecientes != null and !pedidosRecientes.isEmpty()}">
+            <tr th:each="pedido : ${pedidosRecientes}">
+              <td><strong th:text="'#' + ${pedido.id}">#001</strong></td>
+              <td th:text="${pedido.comprador?.nombre ?: 'Cliente'}">Cliente</td>
+              <td th:text="${pedido.cantidadItems ?: 1}">1</td>
+              <td>$<span th:text="${#numbers.formatDecimal(pedido.total ?: 0,0,'COMMA',0,'POINT')}">0</span></td>
+              <td th:text="${#dates.format(pedido.fecha,'dd/MM/yy')}">01/01/25</td>
+              <td>
+                <span class="badge-estado"
+                      th:classappend="${pedido.estado == 'PENDIENTE'  ? 'badge-pendiente'  :
+                                       pedido.estado == 'ENVIADO'    ? 'badge-enviado'    :
+                                       pedido.estado == 'ENTREGADO'  ? 'badge-entregado'  : 'badge-cancelado'}"
+                      th:text="${pedido.estado}">PENDIENTE</span>
+              </td>
+              <td>
+                <a th:href="@{/dashboard/pedidos/{id}(id=${pedido.id})}"
+                   style="color:var(--verde-suave);font-size:0.83rem;font-weight:600;">
+                  Ver
+                </a>
+              </td>
+            </tr>
+          </th:block>
+
+          <!-- Sin pedidos aún -->
+          <tr th:unless="${pedidosRecientes != null and !pedidosRecientes.isEmpty()}">
+            <td colspan="7" style="text-align:center;color:var(--texto-gris);padding:32px;">
+              Aún no tienes pedidos. <a th:href="@{/dashboard/productos}" style="color:var(--verde-suave);font-weight:600;">¡Publica tu primer producto!</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Marcar nav activo según URL
+  const path = window.location.pathname;
+  if (path.includes('/pedidos'))   document.getElementById('nav-pedidos')?.classList.add('active');
+  if (path.includes('/perfil'))    document.getElementById('nav-perfil')?.classList.add('active');
+</script>
+
+</body>
+</html>

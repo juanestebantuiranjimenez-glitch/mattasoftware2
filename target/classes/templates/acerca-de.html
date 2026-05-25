@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Acerca de MATTA</title>
+    <link rel="stylesheet" th:href="@{/css/matta.css}"/>
+    <style>
+        .acerca-header {
+            background: linear-gradient(135deg, var(--verde-oscuro) 0%, var(--verde-medio) 100%);
+            color: white;
+            text-align: center;
+            padding: 80px 24px;
+        }
+        .acerca-header h1 {
+            color: var(--verde-lima);
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+        .acerca-header p {
+            font-size: 1.15rem;
+            max-width: 700px;
+            margin: 0 auto;
+            color: rgba(245,240,220,0.9);
+            line-height: 1.8;
+        }
+        .acerca-container {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 24px;
+        }
+        .mision-vision {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        .tarjeta {
+            background: white;
+            border-radius: var(--radio);
+            border: 1.5px solid var(--borde);
+            padding: 40px;
+            text-align: center;
+            box-shadow: var(--sombra);
+        }
+        .tarjeta-icono {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        .tarjeta h2 {
+            color: var(--verde-oscuro);
+            margin-bottom: 16px;
+            font-size: 1.8rem;
+        }
+        .tarjeta p {
+            color: var(--texto-gris);
+            line-height: 1.6;
+        }
+        .historia {
+            background: white;
+            border-radius: var(--radio);
+            padding: 40px;
+            border: 1.5px solid var(--borde);
+        }
+        .historia h2 {
+            color: var(--verde-oscuro);
+            margin-bottom: 24px;
+            font-size: 2rem;
+            text-align: center;
+        }
+        .historia p {
+            color: var(--texto-gris);
+            line-height: 1.8;
+            margin-bottom: 16px;
+            font-size: 1.05rem;
+        }
+        @media (max-width: 768px) {
+            .mision-vision {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="acerca-header">
+    <h1>Lo Natural es lo Real</h1>
+    <p>Conectamos directamente a los campesinos colombianos con las mesas de nuestras ciudades. Creemos en un comercio justo y transparente sin intermediarios.</p>
+</div>
+
+<div class="acerca-container">
+    <div class="mision-vision">
+        <div class="tarjeta">
+            <div class="tarjeta-icono">🎯</div>
+            <h2>Nuestra Misión</h2>
+            <p>Empoderar al campesino colombiano dándole las herramientas tecnológicas para vender sus productos directamente a los consumidores, garantizando mayores ingresos para el campo y frescura para la ciudad.</p>
+        </div>
+        <div class="tarjeta">
+            <div class="tarjeta-icono">👁️</div>
+            <h2>Nuestra Visión</h2>
+            <p>Convertirnos en la plataforma líder en Colombia para la comercialización directa de productos agrícolas, dignificando la labor campesina y promoviendo el consumo local, responsable y sostenible.</p>
+        </div>
+    </div>
+
+    <div class="historia">
+        <h2>¿Por qué nace MATTA?</h2>
+        <p>MATTA nace al observar la profunda desigualdad en la cadena de suministro agrícola en Colombia. Históricamente, los campesinos realizan el trabajo más duro pero reciben la menor compensación económica debido a la gran cantidad de intermediarios que encarecen el producto final antes de llegar al consumidor.</p>
+        <p>Nos dimos a la tarea de crear una solución tecnológica extremadamente fácil de usar, pensando especialmente en personas con poca experiencia digital. Queremos que cualquier campesino, con solo un celular, pueda tener su propia tienda y que cualquier familia pueda comprarle directamente.</p>
+        <p>Al elegir MATTA, no solo estás comprando alimentos más frescos y a mejor precio, sino que estás apoyando directamente a una familia campesina, promoviendo la economía local y contribuyendo a un país más equitativo.</p>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

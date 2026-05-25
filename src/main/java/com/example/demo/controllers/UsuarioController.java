@@ -19,6 +19,9 @@ public class UsuarioController {
     @Autowired
     private ProductoServices productoService;
 
+    @Autowired
+    private com.example.demo.services.EntregaServices entregaService;
+
     // ── LOGIN ──────────────────────────────────────────
     @GetMapping("/login")
     public String mostrarLogin() {
@@ -27,9 +30,9 @@ public class UsuarioController {
 
     @PostMapping("/login")
     public String procesarLogin(@RequestParam String correo,
-                                @RequestParam String contrasena,
-                                HttpSession session,
-                                Model model) {
+            @RequestParam String contrasena,
+            HttpSession session,
+            Model model) {
 
         Usuarios usuarioEncontrado = usuarioService.login(correo, contrasena);
 
@@ -38,11 +41,11 @@ public class UsuarioController {
             session.setAttribute("usuario", usuarioEncontrado);
             session.setAttribute("cantidadCarrito", 0);
 
-            // Si es campesino, va al dashboard; si es cliente, va a productos
-            if ("CAMPESINO".equalsIgnoreCase(usuarioEncontrado.getTipo_usuario())) {
-                return "redirect:/usuarios/dashboard";
+            // Redirigir según el rol
+            if ("CAMPESINO".equalsIgnoreCase(usuarioEncontrado.getRol())) {
+                return "redirect:/usuarios/dashboard-campesino";
             }
-            return "redirect:/productos/listar";
+            return "redirect:/usuarios/dashboard-cliente";
 
         } else {
             model.addAttribute("error", "Correo o contraseña incorrectos");
@@ -58,8 +61,8 @@ public class UsuarioController {
 
     @PostMapping("/registro")
     public String guardarRegistro(@ModelAttribute Usuarios usuario,
-                                  HttpSession session,
-                                  Model model) {
+            HttpSession session,
+            Model model) {
         // Verificar si el correo ya existe
         if (usuarioService.existeCorreo(usuario.getCorreo())) {
             model.addAttribute("error", "Ya existe una cuenta con ese correo");
@@ -72,27 +75,109 @@ public class UsuarioController {
         session.setAttribute("usuario", usuario);
         session.setAttribute("cantidadCarrito", 0);
 
-        if ("CAMPESINO".equalsIgnoreCase(usuario.getTipo_usuario())) {
-            return "redirect:/usuarios/dashboard";
+        if ("CAMPESINO".equalsIgnoreCase(usuario.getRol())) {
+            return "redirect:/usuarios/dashboard-campesino";
         }
-        return "redirect:/productos/listar";
+        return "redirect:/usuarios/dashboard-cliente";
     }
 
-    // ── DASHBOARD ──────────────────────────────────────
+    // ── DASHBOARDS ──────────────────────────────────────
     @GetMapping("/dashboard")
-    public String dashboard(HttpSession session, Model model) {
+    public String dashboardRedirect(HttpSession session) {
         Usuarios usuario = (Usuarios) session.getAttribute("usuario");
-
-        // Si no está logueado, mandarlo al login
         if (usuario == null) {
             return "redirect:/usuarios/login";
         }
+        if ("CAMPESINO".equalsIgnoreCase(usuario.getRol())) {
+            return "redirect:/usuarios/dashboard-campesino";
+        }
+        return "redirect:/usuarios/dashboard-cliente";
+    }
 
-        // Pasar datos al dashboard
-        model.addAttribute("misProductos",
-            productoService.listarPorUsuario(usuario.getId_usuario()));
+    @GetMapping("/dashboard-campesino")
+    public String dashboardCampesino(HttpSession session, Model model) {
+        Usuarios usuario = (Usuarios) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/usuarios/login";
+        }
+        if (!"CAMPESINO".equalsIgnoreCase(usuario.getRol())) {
+            return "redirect:/usuarios/dashboard-cliente";
+        }
 
-        return "usuarios/dashboard";
+        model.addAttribute("misProductos", productoService.listarPorUsuario(usuario.getId_usuario()));
+        try {
+            model.addAttribute("entregas", entregaService.listarEntregas());
+        } catch(Exception e) {}
+
+        return "usuarios/dashboard-campesino";
+    }
+
+    @GetMapping("/dashboard-cliente")
+    public String dashboardCliente(HttpSession session, Model model) {
+        Usuarios usuario = (Usuarios) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/usuarios/login";
+        }
+        if (!"CLIENTE".equalsIgnoreCase(usuario.getRol())) {
+            return "redirect:/usuarios/dashboard-campesino";
+        }
+
+        return "usuarios/dashboard-cliente";
+    }
+
+    // ── RECUPERAR CONTRASEÑA ───────────────────────────
+    @GetMapping("/recuperar-password")
+    public String mostrarRecuperarPassword() {
+        return "usuarios/recuperar-password";
+    }
+
+    @PostMapping("/recuperar-password")
+    public String procesarRecuperarPassword(@RequestParam String correo,
+            @RequestParam String nuevaPassword,
+            Model model) {
+        boolean exito = usuarioService.actualizarPassword(correo, nuevaPassword);
+        if (exito) {
+            model.addAttribute("exito", "Contraseña actualizada exitosamente. Ahora puedes iniciar sesión.");
+        } else {
+            model.addAttribute("error", "No se encontró un usuario con ese correo.");
+        }
+        return "usuarios/recuperar-password";
+    }
+
+    // ── PERFIL ─────────────────────────────────────────
+    @GetMapping("/perfil")
+    public String mostrarPerfil(HttpSession session, Model model) {
+        Usuarios usuario = (Usuarios) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/usuarios/login";
+        }
+        return "usuarios/perfil";
+    }
+
+    @PostMapping("/perfil")
+    public String procesarPerfil(@RequestParam String nombre,
+            @RequestParam(required = false) String telefono,
+            @RequestParam(required = false) String ubicacion,
+            @RequestParam(required = false) String passwordActual,
+            @RequestParam(required = false) String nuevaPassword,
+            HttpSession session,
+            Model model) {
+        Usuarios usuarioLogueado = (Usuarios) session.getAttribute("usuario");
+        if (usuarioLogueado == null) {
+            return "redirect:/usuarios/login";
+        }
+
+        try {
+            Usuarios usuarioActualizado = usuarioService.actualizarPerfil(
+                    usuarioLogueado.getId_usuario(), nombre, telefono, ubicacion, passwordActual, nuevaPassword);
+
+            session.setAttribute("usuario", usuarioActualizado);
+            model.addAttribute("mensaje", "Perfil actualizado correctamente.");
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+        }
+
+        return "usuarios/perfil";
     }
 
     // ── LOGOUT ─────────────────────────────────────────

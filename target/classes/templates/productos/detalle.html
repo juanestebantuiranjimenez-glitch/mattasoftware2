@@ -26,8 +26,8 @@
         <a th:href="@{/logout}" class="nav-btn">Salir</a>
       </th:block>
       <th:block th:unless="${session.usuario != null}">
-        <a th:href="@{/login}" class="nav-link">Ingresar</a>
-        <a th:href="@{/registro}" class="nav-btn">Registrarse</a>
+        <a th:href="@{/usuarios/login}" class="nav-link">Ingresar</a>
+        <a th:href="@{/usuarios/registro}" class="nav-btn">Registrarse</a>
       </th:block>
     </nav>
   </div>
@@ -49,12 +49,10 @@
 
   <!-- Imagen -->
   <div>
-    <div class="detalle-img-main">
       <img th:if="${producto?.imagen != null}"
            th:src="@{'/uploads/' + ${producto.imagen}}"
            th:alt="${producto.nombre}"/>
       <span th:unless="${producto?.imagen != null}"
-            th:text="${producto?.icono ?: '🥬'}"
             style="font-size:7rem;">🥬</span>
     </div>
 
@@ -66,15 +64,15 @@
       <div style="display:flex;align-items:center;gap:14px;">
         <div class="campesino-avatar" style="width:48px;height:48px;font-size:1.4rem;">👨‍🌾</div>
         <div>
-          <div style="font-weight:700;font-size:1rem;" th:text="${producto?.usuario?.nombre ?: 'Campesino'}">Nombre</div>
-          <div style="font-size:0.82rem;color:var(--texto-gris);" th:text="${producto?.usuario?.ubicacion ?: 'Colombia'}">Ubicación</div>
+          <div style="font-weight:700;font-size:1rem;" th:text="${producto?.usuario?.nombre ?: 'Campesino'}">Campesino</div>
+          <div style="font-size:0.82rem;color:var(--texto-gris);" th:text="${producto?.usuario?.ubicacion ?: 'Colombia'}">Colombia</div>
           <div style="margin-top:6px;">
             <span class="live-dot"></span>
             <span style="font-size:0.78rem;color:var(--verde-suave);font-weight:600;">Activo</span>
           </div>
         </div>
       </div>
-      <a th:href="@{/campesinos/{id}(id=${producto?.usuario?.id})}"
+      <a th:href="@{/productos}"
          style="display:block;text-align:center;margin-top:14px;padding:9px;border:1.5px solid var(--borde);border-radius:var(--radio-sm);font-size:0.83rem;font-weight:600;color:var(--verde-oscuro);transition:all 0.2s;">
         Ver todos sus productos
       </a>
@@ -83,14 +81,14 @@
 
   <!-- Info del producto -->
   <div class="detalle-info">
-    <div class="detalle-cat" th:text="${producto?.categoria?.nombre ?: 'Producto'}">Categoría</div>
+    <div class="detalle-cat">General</div>
     <h1 class="detalle-nombre" th:text="${producto?.nombre}">Nombre del producto</h1>
 
     <!-- Calificación simple -->
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
       <span style="color:#f59e0b;font-size:1rem;">★★★★★</span>
       <span style="font-size:0.82rem;color:var(--texto-gris);">
-        (<span th:text="${producto?.totalCalificaciones ?: 0}">0</span> calificaciones)
+        (0 calificaciones)
       </span>
     </div>
 
@@ -100,9 +98,9 @@
         $<span th:text="${#numbers.formatDecimal(producto?.precio ?: 0, 0,'COMMA',0,'POINT')}">0</span>
       </div>
       <div class="precio-unidad" style="margin-top:2px;">
-        por <span th:text="${producto?.unidad ?: 'kg'}">kg</span>
-        · Stock: <strong th:text="${producto?.cantidadDisponible ?: 0}">0</strong>
-        <span th:text="${producto?.unidad ?: 'kg'}">kg</span> disponibles
+        por kg
+        · Stock: <strong th:text="${producto?.cantidad_disponible ?: 0}">0</strong>
+        kg disponibles
       </div>
     </div>
 
@@ -120,8 +118,7 @@
         <span class="qty-num" id="cantidad">1</span>
         <button class="qty-btn" onclick="cambiarCantidad(1)">+</button>
       </div>
-      <span style="font-size:0.82rem;color:var(--texto-gris);"
-            th:text="${producto?.unidad ?: 'kg'}">kg</span>
+      <span style="font-size:0.82rem;color:var(--texto-gris);">kg</span>
     </div>
 
     <!-- Precio total dinámico -->
@@ -136,17 +133,18 @@
     <!-- Botones -->
     <div class="detalle-acciones">
       <button class="btn-primary" style="flex:1;justify-content:center;"
-              th:data-id="${producto?.id}"
+              th:data-id="${producto?.id_producto}"
               th:data-nombre="${producto?.nombre}"
               th:data-precio="${producto?.precio}"
               onclick="agregarAlCarritoDetalle(this)">
         🛒 Agregar al carrito
       </button>
-      <a th:href="@{/checkout(productoId=${producto?.id}, cantidad=1)}"
-         class="btn-secondary"
-         style="flex:1;text-align:center;padding:14px 32px;border-radius:var(--radio-pill);">
+      <button class="btn-secondary"
+              style="flex:1;text-align:center;padding:14px 32px;border-radius:var(--radio-pill);"
+              th:data-id="${producto?.id_producto}"
+              onclick="comprarAhoraDetalle(this)">
         Comprar ahora
-      </a>
+      </button>
     </div>
 
     <!-- Garantías -->
@@ -180,23 +178,23 @@
   </div>
   <div class="productos-grid">
     <a th:each="rel : ${relacionados}"
-       th:href="@{/productos/{id}(id=${rel.id})}"
+       th:href="@{/productos/{id}(id=${rel.id_producto})}"
        class="producto-card">
       <div class="producto-img">
         <img th:if="${rel.imagen != null}" th:src="@{'/uploads/' + ${rel.imagen}}" th:alt="${rel.nombre}"/>
-        <span th:unless="${rel.imagen != null}" th:text="${rel.icono ?: '🥬'}">🥬</span>
+        <span th:unless="${rel.imagen != null}">🥬</span>
         <span class="badge-fresco">Fresco</span>
       </div>
       <div class="producto-info">
-        <div class="producto-categoria" th:text="${rel.categoria?.nombre}">Cat</div>
+        <div class="producto-categoria">General</div>
         <div class="producto-nombre" th:text="${rel.nombre}">Nombre</div>
-        <div class="producto-campesino">👨‍🌾 <span th:text="${rel.usuario?.nombre}">Campesino</span></div>
+        <div class="producto-campesino">👨‍🌾 <span th:text="${rel.usuario?.nombre ?: 'Campesino'}">Campesino</span></div>
         <div class="producto-footer">
           <div class="producto-precio">
             $<span th:text="${#numbers.formatDecimal(rel.precio,0,'COMMA',0,'POINT')}">0</span>
-            <span class="unidad">/ <span th:text="${rel.unidad}">kg</span></span>
+            <span class="unidad">/ kg</span>
           </div>
-          <button class="btn-agregar" th:data-id="${rel.id}"
+          <button class="btn-agregar" th:data-id="${rel.id_producto}"
                   onclick="agregarAlCarrito(this); event.preventDefault();">+</button>
         </div>
       </div>
@@ -239,7 +237,23 @@
         const badge = document.querySelector('.cart-badge');
         if (badge) badge.textContent = parseInt(badge.textContent || 0) + parseInt(cantidad);
       } else if (res.status === 401) {
-        window.location.href = '/login';
+        window.location.href = '/usuarios/login';
+      }
+    });
+  }
+
+  function comprarAhoraDetalle(btn) {
+    const id       = btn.dataset.id;
+    const cantidad = document.getElementById('cantidad').textContent;
+    fetch('/carrito/agregar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `productoId=${id}&cantidad=${cantidad}`
+    }).then(res => {
+      if (res.ok) {
+        window.location.href = '/checkout';
+      } else if (res.status === 401) {
+        window.location.href = '/usuarios/login';
       }
     });
   }
@@ -255,7 +269,7 @@
         btn.textContent = '✓';
         setTimeout(() => { btn.textContent = '+'; }, 1500);
       } else if (res.status === 401) {
-        window.location.href = '/login';
+        window.location.href = '/usuarios/login';
       }
     });
   }

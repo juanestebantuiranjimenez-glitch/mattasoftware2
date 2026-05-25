@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Campesinos — MATTA</title>
+  <link rel="stylesheet" th:href="@{/css/matta.css}"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a th:href="@{/}" class="navbar-logo">🌿 MATTA</a>
+    <div style="flex:1;"></div>
+    <nav class="navbar-nav">
+      <a th:href="@{/productos}" class="nav-link">Productos</a>
+      <a th:href="@{/campesinos}" class="nav-link active">Campesinos</a>
+      <th:block th:if="${session.usuario != null}">
+        <a th:href="@{/usuarios/dashboard}" class="nav-link">Mi Panel</a>
+        <a th:href="@{/usuarios/logout}" class="nav-btn">Salir</a>
+      </th:block>
+      <th:block th:unless="${session.usuario != null}">
+        <a th:href="@{/usuarios/login}" class="nav-link">Ingresar</a>
+        <a th:href="@{/usuarios/registro}" class="nav-btn">Registrarse</a>
+      </th:block>
+    </nav>
+  </div>
+</nav>
+
+<div style="max-width: 1280px; margin: 60px auto; padding: 0 24px; text-align: center;">
+  <div style="font-size: 4rem; margin-bottom: 20px;">👨‍🌾</div>
+  <h1 style="color: var(--verde-oscuro); font-size: 2.5rem; margin-bottom: 15px;">Nuestros Campesinos</h1>
+  <p style="color: var(--texto-gris); font-size: 1.1rem; max-width: 600px; margin: 0 auto 40px;">
+    Conoce a las personas que cultivan los alimentos más frescos y orgánicos directamente para tu mesa. (Próximamente disponible).
+  </p>
+  <a th:href="@{/productos}" class="btn-primary" style="display: inline-flex; justify-content: center; width: auto; padding: 12px 24px;">
+    Ver todos los productos
+  </a>
+</div>
+
+</body>
+</html>

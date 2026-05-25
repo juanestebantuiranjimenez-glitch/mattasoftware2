@@ -41,8 +41,8 @@
 
       <!-- Si NO está logueado -->
       <th:block th:unless="${session.usuario != null}">
-        <a th:href="@{/login}" class="nav-link">Ingresar</a>
-        <a th:href="@{/registro}" class="nav-btn">Registrarse</a>
+        <a th:href="@{/usuarios/login}" class="nav-link">Ingresar</a>
+        <a th:href="@{/usuarios/registro}" class="nav-btn">Registrarse</a>
       </th:block>
     </nav>
 
@@ -66,7 +66,7 @@
       <a th:href="@{/productos}" class="btn-primary">
         🛍️ Ver productos
       </a>
-      <a th:href="@{/como-funciona}" class="btn-secondary">
+      <a th:href="@{/cursos}" class="btn-secondary">
         ¿Cómo funciona?
       </a>
     </div>
@@ -159,7 +159,7 @@
     <!-- Productos dinámicos desde el backend -->
     <th:block th:if="${productosDestacados != null and !productosDestacados.isEmpty()}">
       <a th:each="prod : ${productosDestacados}"
-         th:href="@{/productos/{id}(id=${prod.id})}"
+         th:href="@{/productos/{id}(id=${prod.id_producto})}"
          class="producto-card fade-in">
         <div class="producto-img">
           <img th:if="${prod.imagen != null}" th:src="@{'/uploads/' + ${prod.imagen}}" th:alt="${prod.nombre}"/>
@@ -178,7 +178,7 @@
               <span class="unidad">/ <span th:text="${prod.unidad ?: 'kg'}">kg</span></span>
             </div>
             <button class="btn-agregar"
-                    th:data-id="${prod.id}"
+                    th:data-id="${prod.id_producto}"
                     th:data-nombre="${prod.nombre}"
                     th:data-precio="${prod.precio}"
                     onclick="agregarAlCarrito(this); event.preventDefault();"
@@ -258,7 +258,7 @@
     </div>
     <div class="banner-btns">
       <a th:href="@{/registro}" class="btn-primary">👨‍🌾 Quiero vender</a>
-      <a th:href="@{/como-funciona}" class="btn-secondary">Conocer más</a>
+      <a th:href="@{/cursos}" class="btn-secondary">Conocer más</a>
     </div>
   </div>
 </div>
@@ -324,15 +324,15 @@
     <div class="footer-col">
       <h4>Vender</h4>
       <ul>
-        <li><a th:href="@{/registro}">Registrarme</a></li>
-        <li><a th:href="@{/como-funciona}">Cómo funciona</a></li>
-        <li><a th:href="@{/dashboard}">Mi panel</a></li>
+        <li><a th:href="@{/usuarios/registro}">Registrarme</a></li>
+        <li><a th:href="@{/cursos}">Aprende a usar MATTA</a></li>
+        <li><a th:href="@{/usuarios/dashboard}">Mi panel</a></li>
       </ul>
     </div>
     <div class="footer-col">
       <h4>Ayuda</h4>
       <ul>
-        <li><a th:href="@{/preguntas-frecuentes}">Preguntas frecuentes</a></li>
+        <li><a th:href="@{/acerca-de}">Acerca de MATTA</a></li>
         <li><a th:href="@{/contacto}">Contacto</a></li>
         <li><a th:href="@{/terminos}">Términos y condiciones</a></li>
       </ul>
@@ -377,7 +377,7 @@
         const badge = document.querySelector('.cart-badge');
         if (badge) badge.textContent = parseInt(badge.textContent || 0) + 1;
       } else if (res.status === 401) {
-        window.location.href = '/login';
+        window.location.href = '/usuarios/login';
       }
     });
   }

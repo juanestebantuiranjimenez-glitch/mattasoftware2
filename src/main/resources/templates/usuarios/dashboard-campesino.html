@@ -30,27 +30,30 @@
     <div class="sidebar-perfil">
       <div class="sidebar-avatar">👨‍🌾</div>
       <div class="sidebar-nombre" th:text="${session.usuario?.nombre ?: 'Campesino'}">Nombre</div>
-      <div class="sidebar-rol"    th:text="${session.usuario?.tipo ?: 'CAMPESINO'}">CAMPESINO</div>
+      <div class="sidebar-rol"    th:text="${session.usuario?.rol ?: 'CAMPESINO'}">CAMPESINO</div>
     </div>
     <nav class="sidebar-nav">
-      <a th:href="@{/dashboard}"          class="active" id="nav-inicio">
+      <a th:href="@{/dashboard}" class="active" id="nav-inicio">
         <span class="icon">📊</span> Resumen
       </a>
-      <a th:href="@{/dashboard/productos}" id="nav-productos">
+      <a href="#mis-productos-section" id="nav-productos">
         <span class="icon">🥬</span> Mis productos
       </a>
-      <a th:href="@{/dashboard/pedidos}"   id="nav-pedidos">
+      <a href="#logistica-section" id="nav-pedidos">
         <span class="icon">📦</span> Pedidos
         <th:block th:if="${pedidosPendientes != null and pedidosPendientes > 0}">
           <span style="margin-left:auto;background:#e53e3e;color:white;font-size:0.68rem;font-weight:700;padding:2px 7px;border-radius:100px;"
                 th:text="${pedidosPendientes}">0</span>
         </th:block>
       </a>
-      <a th:href="@{/dashboard/perfil}"    id="nav-perfil">
+      <a href="#" onclick="alert('Esta sección estará disponible próximamente.'); return false;" id="nav-perfil">
         <span class="icon">👤</span> Mi perfil
       </a>
-      <a th:href="@{/dashboard/ganancias}" id="nav-ganancias">
+      <a href="#" onclick="alert('Esta sección estará disponible próximamente.'); return false;" id="nav-ganancias">
         <span class="icon">💰</span> Ganancias
+      </a>
+      <a href="#logistica-section" id="nav-logistica">
+        <span class="icon">🚚</span> Logística
       </a>
     </nav>
   </aside>
@@ -156,10 +159,10 @@
     </div>
 
     <!-- ─── MIS PRODUCTOS ─── -->
-    <div class="table-container">
+    <div class="table-container" id="mis-productos-section">
       <div class="table-header">
         <h3>🥬 Mis productos</h3>
-        <a th:href="@{/dashboard/productos/nuevo}"
+        <a href="javascript:void(0)" onclick="toggleFormProducto()"
            style="background:var(--verde-lima);color:var(--verde-oscuro);padding:7px 16px;border-radius:var(--radio-pill);font-size:0.82rem;font-weight:700;">
           + Publicar producto
         </a>
@@ -181,31 +184,33 @@
               <td>
                 <div style="display:flex;align-items:center;gap:10px;">
                   <div style="width:36px;height:36px;background:linear-gradient(135deg,#e8f5c8,#d4e8a0);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">
-                    <span th:text="${prod.icono ?: '🥬'}">🥬</span>
+                    <span>🥬</span>
                   </div>
                   <span th:text="${prod.nombre}" style="font-weight:500;">Producto</span>
                 </div>
               </td>
-              <td th:text="${prod.categoria?.nombre ?: '—'}">Cat</td>
+              <td>General</td>
               <td>$<span th:text="${#numbers.formatDecimal(prod.precio,0,'COMMA',0,'POINT')}">0</span></td>
               <td>
-                <span th:text="${prod.cantidadDisponible + ' ' + (prod.unidad ?: 'kg')}"
-                      th:style="${prod.cantidadDisponible < 5 ? 'color:#d97706;font-weight:600;' : ''}">
+                <span th:text="${prod.cantidad_disponible + ' und'}"
+                      th:style="${prod.cantidad_disponible < 5 ? 'color:#d97706;font-weight:600;' : ''}">
                   0 kg
                 </span>
               </td>
               <td>
-                <span class="badge-estado"
-                      th:classappend="${prod.activo ? 'badge-entregado' : 'badge-cancelado'}"
-                      th:text="${prod.activo ? 'Activo' : 'Inactivo'}">Activo</span>
+                <span class="badge-estado badge-entregado">Activo</span>
               </td>
               <td>
-                <div style="display:flex;gap:8px;">
-                  <a th:href="@{/dashboard/productos/{id}/editar(id=${prod.id})}"
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <a th:href="@{/productos/editar/{id}(id=${prod.id_producto})}"
                      style="color:var(--verde-suave);font-size:0.83rem;font-weight:600;">Editar</a>
                   <span style="color:var(--borde);">|</span>
-                  <a th:href="@{/productos/{id}(id=${prod.id})}"
+                  <a th:href="@{/productos/{id}(id=${prod.id_producto})}"
                      style="color:var(--texto-gris);font-size:0.83rem;">Ver</a>
+                  <span style="color:var(--borde);">|</span>
+                  <form th:action="@{/productos/eliminar/{id}(id=${prod.id_producto})}" method="post" style="margin:0;" onsubmit="return confirm('¿Estás seguro de eliminar este producto?');">
+                    <button type="submit" style="background:none;border:none;color:#dc2626;font-size:0.83rem;font-weight:600;cursor:pointer;padding:0;">Borrar</button>
+                  </form>
                 </div>
               </td>
             </tr>
@@ -213,9 +218,48 @@
           <tr th:unless="${misProductos != null and !misProductos.isEmpty()}">
             <td colspan="6" style="text-align:center;color:var(--texto-gris);padding:32px;">
               No has publicado productos aún.
-              <a th:href="@{/dashboard/productos/nuevo}" style="color:var(--verde-suave);font-weight:600;">
+              <a href="javascript:void(0)" onclick="toggleFormProducto()" style="color:var(--verde-suave);font-weight:600;">
                 Publicar mi primer producto →
               </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ─── LOGÍSTICA / ENTREGAS ─── -->
+    <div class="table-container" id="logistica-section">
+      <div class="table-header">
+        <h3>🚚 Logística y Entregas</h3>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID Entrega</th>
+            <th>Pedido #</th>
+            <th>Dirección</th>
+            <th>Fecha Entrega</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <th:block th:if="${entregas != null and !entregas.isEmpty()}">
+            <tr th:each="entrega : ${entregas}">
+              <td><strong th:text="'E-' + ${entrega.id_entrega}">E-001</strong></td>
+              <td th:text="'#' + ${entrega.id_pedido}">#1</td>
+              <td th:text="${entrega.direccion}">Dirección</td>
+              <td th:text="${entrega.fecha_entrega ?: 'Por confirmar'}">Fecha</td>
+              <td>
+                <span class="badge-estado"
+                      th:classappend="${entrega.estado_entrega == 'En camino' ? 'badge-pendiente' :
+                                       entrega.estado_entrega == 'Entregado' ? 'badge-entregado' : 'badge-cancelado'}"
+                      th:text="${entrega.estado_entrega}">En camino</span>
+              </td>
+            </tr>
+          </th:block>
+          <tr th:unless="${entregas != null and !entregas.isEmpty()}">
+            <td colspan="5" style="text-align:center;color:var(--texto-gris);padding:32px;">
+              No hay entregas pendientes o registradas.
             </td>
           </tr>
         </tbody>
@@ -226,9 +270,8 @@
     <div id="form-nuevo-producto" style="display:none;">
       <div class="form-card">
         <h3>➕ Publicar nuevo producto</h3>
-        <form th:action="@{/dashboard/productos/nuevo}" method="post"
-              enctype="multipart/form-data">
-          <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <form th:action="@{/productos/guardar}" method="post" enctype="multipart/form-data">
+          <input type="hidden" name="usuario.id_usuario" th:value="${session.usuario.id_usuario}"/>
 
           <div class="form-row">
             <div class="form-group">
@@ -277,11 +320,7 @@
           <div class="form-row">
             <div class="form-group">
               <label>Cantidad disponible *</label>
-              <input type="number" name="cantidadDisponible" placeholder="Ej: 50" min="0" required/>
-            </div>
-            <div class="form-group">
-              <label>Emoji (ícono)</label>
-              <input type="text" name="icono" placeholder="🥬" maxlength="2"/>
+              <input type="number" name="cantidad_disponible" placeholder="Ej: 50" min="0" required/>
             </div>
           </div>
 
@@ -298,7 +337,7 @@
               <div class="upload-icon">📷</div>
               <p>Haz clic para subir una foto</p>
               <p style="font-size:0.75rem;margin-top:4px;">JPG, PNG · máximo 5 MB</p>
-              <input type="file" id="foto-input" name="imagen"
+              <input type="file" id="foto-input" name="file"
                      accept="image/*" style="display:none;"
                      onchange="mostrarNombreFoto(this)"/>
             </div>

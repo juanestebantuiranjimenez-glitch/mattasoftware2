@@ -2,7 +2,7 @@ package com.example.demo.models;
 import jakarta.persistence.*;
 
 @Entity 
-@Table(name = "USUARIO") 
+@Table(name = "usuario") 
 public class Usuarios {
     
 
@@ -13,19 +13,19 @@ public class Usuarios {
     private String correo;
     private String telefono;
     private String contrasena;
-    private String tipo_usuario; 
+    private String rol; 
     private String ubicacion;
 
     public Usuarios() {
     }
 
-    public Usuarios(int id_usuario, String nombre, String correo, String telefono, String contrasena, String tipo_usuario, String ubicacion) {
+    public Usuarios(int id_usuario, String nombre, String correo, String telefono, String contrasena, String rol, String ubicacion) {
         this.id_usuario = id_usuario;
         this.nombre = nombre;
         this.correo = correo;
         this.telefono = telefono;
         this.contrasena = contrasena;
-        this.tipo_usuario = tipo_usuario;
+        this.rol = rol;
         this.ubicacion = ubicacion;
     }
 
@@ -70,12 +70,12 @@ public class Usuarios {
         this.contrasena = contrasena;
     }
 
-    public String getTipo_usuario() {
-        return tipo_usuario;
+    public String getRol() {
+        return rol;
     }
 
-    public void setTipo_usuario(String tipo_usuario) {
-        this.tipo_usuario = tipo_usuario;
+    public void setRol(String rol) {
+        this.rol = rol;
     }
 
     public String getUbicacion() {

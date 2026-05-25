@@ -153,12 +153,12 @@
         <a th:href="@{/carrito}" class="nav-carrito">🛒
           <span class="cart-badge" th:text="${session.cantidadCarrito ?: 0}">0</span>
         </a>
-        <a th:href="@{/dashboard}" class="nav-link">Mi Panel</a>
-        <a th:href="@{/logout}" class="nav-btn">Salir</a>
+        <a th:href="@{/usuarios/dashboard}" class="nav-link">Mi Panel</a>
+        <a th:href="@{/usuarios/logout}" class="nav-btn">Salir</a>
       </th:block>
       <th:block th:unless="${session.usuario != null}">
-        <a th:href="@{/login}" class="nav-link">Ingresar</a>
-        <a th:href="@{/registro}" class="nav-btn">Registrarse</a>
+        <a th:href="@{/usuarios/login}" class="nav-link">Ingresar</a>
+        <a th:href="@{/usuarios/registro}" class="nav-btn">Registrarse</a>
       </th:block>
     </nav>
   </div>
@@ -260,7 +260,7 @@
           <th:block th:unless="${categoriaActual != null}">Todos los productos</th:block>
         </h2>
         <p th:if="${productos != null}"
-           th:text="${productos.totalElements != null ? productos.totalElements + ' resultados encontrados' : productos.size() + ' productos'}">
+           th:text="${productos.size() + ' productos'}">
           Resultados
         </p>
       </div>
@@ -284,33 +284,28 @@
 
       <th:block th:if="${productos != null and !#lists.isEmpty(productos)}">
         <th:block th:each="prod : ${productos}">
-          <a th:href="@{/productos/{id}(id=${prod.id})}" class="producto-card">
+          <a th:href="@{/productos/{id}(id=${prod.id_producto})}" class="producto-card">
             <div class="producto-img">
               <img th:if="${prod.imagen != null}"
                    th:src="@{'/uploads/' + ${prod.imagen}}"
                    th:alt="${prod.nombre}"/>
-              <span th:unless="${prod.imagen != null}"
-                    th:text="${prod.icono ?: '🥬'}">🥬</span>
+              <span th:unless="${prod.imagen != null}">🥬</span>
               <span class="badge-fresco">Fresco</span>
-              <span th:if="${prod.enOferta}" class="badge-oferta">Oferta</span>
+              <span class="badge-fresco">Fresco</span>
             </div>
             <div class="producto-info">
-              <div class="producto-categoria"
-                   th:text="${prod.categoria?.nombre ?: 'Producto'}">Cat</div>
+              <div class="producto-categoria">General</div>
               <div class="producto-nombre" th:text="${prod.nombre}">Nombre</div>
               <div class="producto-campesino">
                 👨‍🌾 <span th:text="${prod.usuario?.nombre ?: 'Campesino'}">Campesino</span>
-                <span th:if="${prod.usuario?.ubicacion != null}"
-                      th:text="'— ' + ${prod.usuario.ubicacion}"
-                      style="color:var(--borde);">— Ciudad</span>
               </div>
               <div class="producto-footer">
                 <div class="producto-precio">
                   $<span th:text="${#numbers.formatDecimal(prod.precio,0,'COMMA',0,'POINT')}">0</span>
-                  <span class="unidad">/ <span th:text="${prod.unidad ?: 'kg'}">kg</span></span>
+                  <span class="unidad">/ kg</span>
                 </div>
                 <button class="btn-agregar"
-                        th:data-id="${prod.id}"
+                        th:data-id="${prod.id_producto}"
                         th:data-nombre="${prod.nombre}"
                         onclick="agregarAlCarrito(this); event.preventDefault();"
                         title="Agregar al carrito">+</button>
@@ -332,26 +327,7 @@
 
     </div>
 
-    <!-- PAGINACIÓN -->
-    <div th:if="${productos != null and productos.totalPages > 1}"
-         style="display:flex;justify-content:center;gap:8px;margin-top:32px;flex-wrap:wrap;">
-      <a th:if="${!productos.first}"
-         th:href="@{/productos(page=${productos.number - 1}, q=${param.q}, categoria=${param.categoria}, orden=${param.orden})}"
-         style="padding:8px 16px;border:1.5px solid var(--borde);border-radius:var(--radio-sm);font-size:0.85rem;background:white;">
-        ← Anterior
-      </a>
-      <th:block th:each="i : ${#numbers.sequence(0, productos.totalPages - 1)}">
-        <a th:href="@{/productos(page=${i}, q=${param.q}, categoria=${param.categoria}, orden=${param.orden})}"
-           th:text="${i + 1}"
-           th:style="${i == productos.number ? 'background:var(--verde-oscuro);color:var(--verde-lima);' : 'background:white;'}"
-           style="padding:8px 14px;border:1.5px solid var(--borde);border-radius:var(--radio-sm);font-size:0.85rem;">1</a>
-      </th:block>
-      <a th:if="${!productos.last}"
-         th:href="@{/productos(page=${productos.number + 1}, q=${param.q}, categoria=${param.categoria}, orden=${param.orden})}"
-         style="padding:8px 16px;border:1.5px solid var(--borde);border-radius:var(--radio-sm);font-size:0.85rem;background:white;">
-        Siguiente →
-      </a>
-    </div>
+    <!-- PAGINACIÓN REMOVIDA PARA EVITAR ERRORES DE MODELO -->
 
   </div>
 </div>
@@ -395,7 +371,7 @@
         const badge = document.querySelector('.cart-badge');
         if (badge) badge.textContent = parseInt(badge.textContent || 0) + 1;
       } else if (res.status === 401) {
-        window.location.href = '/login';
+        window.location.href = '/usuarios/login';
       }
     });
   }

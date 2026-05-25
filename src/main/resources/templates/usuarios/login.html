@@ -41,7 +41,7 @@
         ✅ <span th:text="${mensajeExito}">¡Registro exitoso!</span>
       </div>
 
-      <form th:action="@{/login}" method="post">
+      <form th:action="@{/usuarios/login}" method="post">
         <!-- CSRF Token de Spring Security (si lo usas) -->
         <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
@@ -53,12 +53,12 @@
 
         <div class="form-group">
           <label for="password-login">Contraseña</label>
-          <input type="password" id="password-login" name="password"
+          <input type="password" id="password-login" name="contrasena"
                  placeholder="Tu contraseña" required autocomplete="current-password"/>
         </div>
 
         <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
-          <a th:href="@{/recuperar-clave}"
+          <a th:href="@{/usuarios/recuperar-password}"
              style="font-size:0.82rem;color:var(--verde-suave);font-weight:500;">
             ¿Olvidaste tu contraseña?
           </a>
@@ -95,9 +95,9 @@
         </div>
       </div>
 
-      <form th:action="@{/registro}" method="post" id="form-reg">
+      <form th:action="@{/usuarios/registro}" method="post" id="form-reg">
         <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-        <input type="hidden" id="tipo-usuario-input" name="tipo" value="CLIENTE"/>
+        <input type="hidden" id="tipo-usuario-input" name="tipo_usuario" value="CLIENTE"/>
 
         <div class="form-group">
           <label for="nombre-reg">Nombre completo</label>
@@ -128,7 +128,7 @@
 
         <div class="form-group">
           <label for="password-reg">Contraseña</label>
-          <input type="password" id="password-reg" name="password"
+          <input type="password" id="password-reg" name="contrasena"
                  placeholder="Mínimo 6 caracteres" required
                  minlength="6" autocomplete="new-password"/>
         </div>

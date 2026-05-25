@@ -16,7 +16,9 @@
                         <h3 class="mb-0">Publicar Nuevo Producto</h3>
                     </div>
                     <div class="card-body">
-                        <form th:action="@{/productos/guardar}" method="post">
+                        <form th:action="@{/productos/guardar}" method="post" enctype="multipart/form-data">
+                            <!-- ID Usuario logueado -->
+                            <input type="hidden" name="usuario.id_usuario" th:value="${session.usuario != null ? session.usuario.id_usuario : 1}"/>
                             <div class="mb-3">
                                 <label class="form-label">Nombre del Producto</label>
                                 <input type="text" name="nombre" class="form-control" placeholder="Ej: Papa Sabanera" required>
@@ -34,6 +36,10 @@
                                     <label class="form-label">Cantidad Disponible</label>
                                     <input type="number" name="cantidad_disponible" class="form-control" required>
                                 </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Foto del Producto</label>
+                                <input type="file" name="file" class="form-control" accept="image/*">
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Publicar Producto</button>
                         </form>

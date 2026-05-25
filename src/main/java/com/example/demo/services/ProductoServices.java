@@ -29,6 +29,10 @@ public class ProductoServices {
 
     // Listar productos de un campesino para el dashboard
     public List<Producto> listarPorUsuario(int idUsuario) {
-    return productoRepository.findByIdUsuario(idUsuario);
-}
+        return productoRepository.findByIdUsuario(idUsuario);
+    }
+
+    public void eliminar(int id) {
+        productoRepository.deleteById(id);
+    }
 }

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout — MATTA</title>
+  <link rel="stylesheet" th:href="@{/css/matta.css}"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a th:href="@{/}" class="navbar-logo">🌿 MATTA</a>
+    <nav class="navbar-nav">
+      <a th:href="@{/carrito}" class="nav-link">Volver al Carrito</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="carrito-layout" style="margin-top:40px;">
+
+  <!-- ─── RESUMEN Y DATOS ─── -->
+  <div>
+    <h1 class="carrito-titulo">Finaliza tu compra</h1>
+    
+    <div style="background:white; border-radius:var(--radio-md); border:1px solid var(--borde); padding:24px; margin-bottom:24px;">
+      <h3 style="margin-bottom:16px;">Datos de Envío</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre Completo</label>
+          <input type="text" th:value="${session.usuario.nombre}" readonly style="background:#f9fafb;" />
+        </div>
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="text" th:value="${session.usuario.telefono}" readonly style="background:#f9fafb;" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Dirección de Entrega</label>
+        <input type="text" placeholder="Ej: Calle 123 #45-67" required />
+      </div>
+    </div>
+
+    <div style="background:white; border-radius:var(--radio-md); border:1px solid var(--borde); padding:24px;">
+      <h3 style="margin-bottom:16px;">Método de Pago</h3>
+      
+      <form th:action="@{/checkout/procesar}" method="post">
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
+          <!-- Nequi -->
+          <label style="border:1px solid var(--verde-suave); border-radius:8px; padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer; background:#f0fdf4;">
+            <input type="radio" name="metodoPago" value="NEQUI" checked />
+            <span style="font-size:1.5rem;">💜</span>
+            <div>
+              <div style="font-weight:700; color:var(--texto-oscuro);">Nequi</div>
+              <div style="font-size:0.8rem; color:var(--texto-gris);">Transferencia rápida</div>
+            </div>
+          </label>
+          
+          <!-- PSE -->
+          <label style="border:1px solid var(--borde); border-radius:8px; padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer;">
+            <input type="radio" name="metodoPago" value="PSE" />
+            <span style="font-size:1.5rem;">🏦</span>
+            <div>
+              <div style="font-weight:700; color:var(--texto-oscuro);">PSE</div>
+              <div style="font-size:0.8rem; color:var(--texto-gris);">Débito bancario</div>
+            </div>
+          </label>
+          
+          <!-- Tarjeta -->
+          <label style="border:1px solid var(--borde); border-radius:8px; padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer;">
+            <input type="radio" name="metodoPago" value="TARJETA" />
+            <span style="font-size:1.5rem;">💳</span>
+            <div>
+              <div style="font-weight:700; color:var(--texto-oscuro);">Tarjeta</div>
+              <div style="font-size:0.8rem; color:var(--texto-gris);">Crédito / Débito</div>
+            </div>
+          </label>
+
+          <!-- Contra entrega -->
+          <label style="border:1px solid var(--borde); border-radius:8px; padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer;">
+            <input type="radio" name="metodoPago" value="CONTRA_ENTREGA" />
+            <span style="font-size:1.5rem;">💵</span>
+            <div>
+              <div style="font-weight:700; color:var(--texto-oscuro);">Efectivo</div>
+              <div style="font-size:0.8rem; color:var(--texto-gris);">Pago contra entrega</div>
+            </div>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">
+          Pagar $<span th:text="${#numbers.formatDecimal(total ?: 0, 0,'COMMA',0,'POINT')}">0</span>
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ─── RESUMEN DEL PEDIDO ─── -->
+  <div>
+    <div class="resumen-card">
+      <h3>Resumen del pedido</h3>
+      
+      <div th:each="item : ${itemsCarrito}" style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:0.85rem; border-bottom:1px solid var(--borde); padding-bottom:8px;">
+        <span th:text="${item.cantidad + 'x ' + item.producto.nombre}">1x Producto</span>
+        <span style="font-weight:600;">$<span th:text="${#numbers.formatDecimal(item.producto.precio * item.cantidad, 0,'COMMA',0,'POINT')}">0</span></span>
+      </div>
+
+      <div class="resumen-linea" style="margin-top:16px;">
+        <span>Subtotal</span>
+        <span>$<span th:text="${#numbers.formatDecimal(subtotal ?: 0, 0,'COMMA',0,'POINT')}">0</span></span>
+      </div>
+      <div class="resumen-linea">
+        <span>Descuento</span>
+        <span style="color:var(--verde-suave);">-$<span th:text="${#numbers.formatDecimal(descuento ?: 0, 0,'COMMA',0,'POINT')}">0</span></span>
+      </div>
+
+      <div class="resumen-linea total">
+        <span>Total a Pagar</span>
+        <span>$<span th:text="${#numbers.formatDecimal(total ?: 0, 0,'COMMA',0,'POINT')}">0</span></span>
+      </div>
+      
+      <!-- Confianza -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:24px;font-size:0.78rem;color:var(--texto-gris);">
+        <span>🔒</span> Pagos seguros encriptados
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
