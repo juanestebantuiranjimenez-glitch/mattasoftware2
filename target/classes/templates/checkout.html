@@ -24,6 +24,10 @@
   <div>
     <h1 class="carrito-titulo">Finaliza tu compra</h1>
     
+    <div th:if="${error}" class="alert" style="background:#fee2e2; color:#b91c1c; border:1px solid #f87171; padding:16px; border-radius:8px; margin-bottom:24px;">
+      <span th:text="${error}"></span>
+    </div>
+    
     <div style="background:white; border-radius:var(--radio-md); border:1px solid var(--borde); padding:24px; margin-bottom:24px;">
       <h3 style="margin-bottom:16px;">Datos de Envío</h3>
       <div class="form-row">
@@ -103,8 +107,8 @@
       <h3>Resumen del pedido</h3>
       
       <div th:each="item : ${itemsCarrito}" style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:0.85rem; border-bottom:1px solid var(--borde); padding-bottom:8px;">
-        <span th:text="${item.cantidad + 'x ' + item.producto.nombre}">1x Producto</span>
-        <span style="font-weight:600;">$<span th:text="${#numbers.formatDecimal(item.producto.precio * item.cantidad, 0,'COMMA',0,'POINT')}">0</span></span>
+        <span th:text="${item.cantidad + 'x ' + item.nombre}">1x Producto</span>
+        <span style="font-weight:600;">$<span th:text="${#numbers.formatDecimal(item.precio * item.cantidad, 0,'COMMA',0,'POINT')}">0</span></span>
       </div>
 
       <div class="resumen-linea" style="margin-top:16px;">

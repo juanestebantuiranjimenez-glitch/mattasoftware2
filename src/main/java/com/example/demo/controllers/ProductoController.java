@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,16 +27,75 @@ public class ProductoController {
     private ProductoServices productoService;
 
     @GetMapping({"", "/", "/listar"})
-    public String listar(Model model, jakarta.servlet.http.HttpSession session) {
+    public String listar(Model model,
+                         jakarta.servlet.http.HttpSession session,
+                         @RequestParam(required = false) String q,
+                         @RequestParam(required = false) String categoria,
+                         @RequestParam(required = false) Double precioMin,
+                         @RequestParam(required = false) Double precioMax,
+                         @RequestParam(required = false) String departamento,
+                         @RequestParam(required = false) String soloDisponibles,
+                         @RequestParam(required = false) String orden) {
         if (session.getAttribute("usuario") == null) {
             return "redirect:/usuarios/login";
         }
         List<Producto> productos = productoService.listarTodos();
-        
-        // "productos" es el nombre que usamos en el HTML (th:each)
+
+        // Filtro por búsqueda de texto
+        if (q != null && !q.trim().isEmpty()) {
+            String busq = q.trim().toLowerCase();
+            productos = productos.stream()
+                .filter(p -> p.getNombre().toLowerCase().contains(busq)
+                          || (p.getDescripcion() != null && p.getDescripcion().toLowerCase().contains(busq)))
+                .collect(java.util.stream.Collectors.toList());
+        }
+
+        // Filtro por precio mínimo
+        if (precioMin != null) {
+            productos = productos.stream()
+                .filter(p -> p.getPrecio() >= precioMin)
+                .collect(java.util.stream.Collectors.toList());
+        }
+
+        // Filtro por precio máximo
+        if (precioMax != null) {
+            productos = productos.stream()
+                .filter(p -> p.getPrecio() <= precioMax)
+                .collect(java.util.stream.Collectors.toList());
+        }
+
+        // Filtro solo disponibles
+        if ("true".equals(soloDisponibles)) {
+            productos = productos.stream()
+                .filter(p -> p.getCantidad_disponible() > 0)
+                .collect(java.util.stream.Collectors.toList());
+        }
+
+        // Filtro por departamento (por ubicación del campesino)
+        if (departamento != null && !departamento.isEmpty()) {
+            String dep = departamento.toLowerCase();
+            productos = productos.stream()
+                .filter(p -> p.getUsuario() != null
+                          && p.getUsuario().getUbicacion() != null
+                          && p.getUsuario().getUbicacion().toLowerCase().contains(dep))
+                .collect(java.util.stream.Collectors.toList());
+        }
+
+        // Ordenamiento
+        if ("precio_asc".equals(orden)) {
+            productos.sort(java.util.Comparator.comparingDouble(Producto::getPrecio));
+        } else if ("precio_desc".equals(orden)) {
+            productos.sort(java.util.Comparator.comparingDouble(Producto::getPrecio).reversed());
+        } else if ("nombre".equals(orden)) {
+            productos.sort(java.util.Comparator.comparing(Producto::getNombre));
+        }
+        // "reciente" → orden por defecto (ID desc)
+        else {
+            productos.sort(java.util.Comparator.comparingInt(Producto::getId_producto).reversed());
+        }
+
         model.addAttribute("productos", productos);
-        
-        return "productos/lista"; // Esto busca el archivo templates/productos/lista.html
+        return "productos/lista";
     }
 
     // Muestra el formulario para subir producto
@@ -60,9 +120,8 @@ public class ProductoController {
 
         if (file != null && !file.isEmpty()) {
             try {
-                // Directorio donde se guardarán las imágenes
-                String uploadDir = "src/main/resources/static/uploads/";
-                Path uploadPath = Paths.get(uploadDir);
+                // Directorio uploads en la raíz del proyecto (accesible en runtime)
+                Path uploadPath = Paths.get("uploads").toAbsolutePath();
                 
                 if (!Files.exists(uploadPath)) {
                     Files.createDirectories(uploadPath);
@@ -131,8 +190,7 @@ public class ProductoController {
             
             if (file != null && !file.isEmpty()) {
                 try {
-                    String uploadDir = "src/main/resources/static/uploads/";
-                    Path uploadPath = Paths.get(uploadDir);
+                    Path uploadPath = Paths.get("uploads").toAbsolutePath();
                     if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);
                     String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
                     Files.copy(file.getInputStream(), uploadPath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);

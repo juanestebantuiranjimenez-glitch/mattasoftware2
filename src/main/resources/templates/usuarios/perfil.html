@@ -16,7 +16,7 @@
     <nav class="navbar-nav">
       <a th:href="@{/productos}" class="nav-link">Productos</a>
       <th:block th:if="${session.usuario != null}">
-        <a th:if="${session.usuario.tipo == 'CAMPESINO'}" th:href="@{/usuarios/dashboard}" class="nav-link">Mi Panel</a>
+        <a th:href="@{/usuarios/dashboard}" class="nav-link">Mi Panel</a>
       </th:block>
       <a th:href="@{/usuarios/logout}" class="nav-btn">Salir</a>
     </nav>
@@ -42,7 +42,7 @@
 
       <div class="form-group">
         <label>Tipo de Usuario</label>
-        <input type="text" th:value="${session.usuario.tipo}" disabled style="background: #f3f4f6;" />
+        <input type="text" th:value="${session.usuario.rol}" disabled style="background: #f3f4f6;" />
       </div>
 
       <div class="form-group">
@@ -60,7 +60,7 @@
         <input type="text" id="telefono" name="telefono" th:value="${session.usuario.telefono}"/>
       </div>
 
-      <div class="form-group" th:if="${session.usuario.tipo == 'CAMPESINO'}">
+      <div class="form-group" th:if="${session.usuario.rol == 'CAMPESINO'}">
         <label for="ubicacion">Ubicación (Vereda / Municipio)</label>
         <input type="text" id="ubicacion" name="ubicacion" th:value="${session.usuario.ubicacion}" required/>
       </div>

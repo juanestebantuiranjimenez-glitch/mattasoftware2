@@ -35,8 +35,8 @@
           🛒
           <span class="cart-badge" th:text="${session.cantidadCarrito ?: 0}">0</span>
         </a>
-        <a th:href="@{/dashboard}" class="nav-link">Mi Panel</a>
-        <a th:href="@{/logout}" class="nav-btn">Salir</a>
+        <a th:href="@{/usuarios/dashboard}" class="nav-link">Mi Panel</a>
+        <a th:href="@{/usuarios/logout}" class="nav-btn">Salir</a>
       </th:block>
 
       <!-- Si NO está logueado -->
@@ -257,7 +257,7 @@
       </p>
     </div>
     <div class="banner-btns">
-      <a th:href="@{/registro}" class="btn-primary">👨‍🌾 Quiero vender</a>
+      <a th:href="@{/usuarios/registro}" class="btn-primary">👨‍🌾 Quiero vender</a>
       <a th:href="@{/cursos}" class="btn-secondary">Conocer más</a>
     </div>
   </div>

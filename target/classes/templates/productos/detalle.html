@@ -22,8 +22,8 @@
         <a th:href="@{/carrito}" class="nav-carrito">🛒
           <span class="cart-badge" th:text="${session.cantidadCarrito ?: 0}">0</span>
         </a>
-        <a th:href="@{/dashboard}" class="nav-link">Mi Panel</a>
-        <a th:href="@{/logout}" class="nav-btn">Salir</a>
+        <a th:href="@{/usuarios/dashboard}" class="nav-link">Mi Panel</a>
+        <a th:href="@{/usuarios/logout}" class="nav-btn">Salir</a>
       </th:block>
       <th:block th:unless="${session.usuario != null}">
         <a th:href="@{/usuarios/login}" class="nav-link">Ingresar</a>

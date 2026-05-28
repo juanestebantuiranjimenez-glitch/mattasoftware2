@@ -39,7 +39,7 @@ public class CarritoController {
 
     // Calcular el subtotal del carrito
     private double calcularSubtotal(List<CarritoItem> carrito) {
-        return carrito.stream().mapToDouble(item -> item.getProducto().getPrecio() * item.getCantidad()).sum();
+        return carrito.stream().mapToDouble(item -> item.getPrecio() * item.getCantidad()).sum();
     }
 
     @GetMapping
@@ -75,27 +75,41 @@ public class CarritoController {
         List<CarritoItem> carrito = obtenerCarrito(session);
         
         Producto producto = productoService.buscarPorId(productoId);
-        if (producto != null) {
-            boolean encontrado = false;
-            for (CarritoItem item : carrito) {
-                if (item.getProducto().getId_producto() == productoId) {
-                    item.setCantidad(item.getCantidad() + 1);
-                    encontrado = true;
-                    break;
-                }
-            }
-            if (!encontrado) {
-                carrito.add(new CarritoItem(producto, 1));
-            }
-            
-            int totalItems = calcularTotalItems(carrito);
-            session.setAttribute("cantidadCarrito", totalItems); // Para el navbar
-            response.put("totalItems", totalItems);
-            response.put("exito", true);
-        } else {
+        if (producto == null) {
             response.put("exito", false);
+            response.put("error", "Producto no encontrado");
+            return response;
+        }
+        if (producto.getCantidad_disponible() <= 0) {
+            response.put("exito", false);
+            response.put("error", "Producto sin stock disponible");
+            return response;
+        }
+
+        boolean encontrado = false;
+        for (CarritoItem item : carrito) {
+            if (item.getProductoId() == productoId) {
+                int nuevaCantidad = item.getCantidad() + 1;
+                if (nuevaCantidad > producto.getCantidad_disponible()) {
+                    response.put("exito", false);
+                    response.put("error", "No hay más stock disponible");
+                    return response;
+                }
+                item.setCantidad(nuevaCantidad);
+                item.setStockDisponible(producto.getCantidad_disponible());
+                encontrado = true;
+                break;
+            }
+        }
+
+        if (!encontrado) {
+            carrito.add(new CarritoItem(producto, 1));
         }
         
+        int totalItems = calcularTotalItems(carrito);
+        session.setAttribute("cantidadCarrito", totalItems); // Para el navbar
+        response.put("totalItems", totalItems);
+        response.put("exito", true);
         return response;
     }
 
@@ -104,27 +118,48 @@ public class CarritoController {
     public Map<String, Object> actualizarCarrito(@RequestParam int productoId, @RequestParam int delta, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         if (session.getAttribute("usuario") == null) {
+            response.put("exito", false);
             response.put("error", "No autenticado");
             return response;
         }
         List<CarritoItem> carrito = obtenerCarrito(session);
         
         CarritoItem itemAEliminar = null;
-        
+        CarritoItem itemEncontrado = null;
         for (CarritoItem item : carrito) {
-            if (item.getProducto().getId_producto() == productoId) {
-                int nuevaCantidad = item.getCantidad() + delta;
-                if (nuevaCantidad <= 0) {
-                    itemAEliminar = item;
-                    response.put("eliminado", true);
-                } else {
-                    item.setCantidad(nuevaCantidad);
-                    response.put("eliminado", false);
-                    response.put("cantidad", nuevaCantidad);
-                    response.put("precioLinea", nuevaCantidad * item.getProducto().getPrecio());
-                }
+            if (item.getProductoId() == productoId) {
+                itemEncontrado = item;
                 break;
             }
+        }
+
+        if (itemEncontrado == null) {
+            response.put("exito", false);
+            response.put("error", "Producto no encontrado en el carrito");
+            return response;
+        }
+
+        int nuevaCantidad = itemEncontrado.getCantidad() + delta;
+        if (nuevaCantidad <= 0) {
+            itemAEliminar = itemEncontrado;
+            response.put("eliminado", true);
+        } else {
+            Producto producto = productoService.buscarPorId(productoId);
+            if (producto == null) {
+                response.put("exito", false);
+                response.put("error", "Producto no encontrado");
+                return response;
+            }
+            if (nuevaCantidad > producto.getCantidad_disponible()) {
+                response.put("exito", false);
+                response.put("error", "Stock insuficiente");
+                return response;
+            }
+            itemEncontrado.setCantidad(nuevaCantidad);
+            itemEncontrado.setStockDisponible(producto.getCantidad_disponible());
+            response.put("eliminado", false);
+            response.put("cantidad", nuevaCantidad);
+            response.put("precioLinea", nuevaCantidad * itemEncontrado.getPrecio());
         }
         
         if (itemAEliminar != null) {
@@ -141,6 +176,7 @@ public class CarritoController {
         response.put("totalItems", totalItems);
         response.put("subtotal", subtotal);
         response.put("total", subtotal - descuento);
+        response.put("exito", true);
         
         return response;
     }
@@ -154,12 +190,11 @@ public class CarritoController {
             return response;
         }
         List<CarritoItem> carrito = obtenerCarrito(session);
-        carrito.removeIf(item -> item.getProducto().getId_producto() == productoId);
+        carrito.removeIf(item -> item.getProductoId() == productoId);
         
         int totalItems = calcularTotalItems(carrito);
         session.setAttribute("cantidadCarrito", totalItems);
         
-        Map<String, Object> response = new HashMap<>();
         response.put("exito", true);
         return response;
     }

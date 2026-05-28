@@ -17,7 +17,7 @@
       <a th:href="@{/}" class="nav-link">Ir a la tienda</a>
       <span style="color:rgba(245,240,220,0.5);font-size:0.85rem;"
             th:text="${session.usuario?.nombre ?: 'Usuario'}">Nombre</span>
-      <a th:href="@{/logout}" class="nav-btn">Salir</a>
+      <a th:href="@{/usuarios/logout}" class="nav-btn">Salir</a>
     </nav>
   </div>
 </nav>

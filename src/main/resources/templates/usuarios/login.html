@@ -81,6 +81,7 @@
            style="background:#fee2e2;color:#b91c1c;border-radius:8px;padding:10px 14px;font-size:0.85rem;margin-bottom:16px;">
         ⚠️ <span th:text="${errorRegistro}">Error al registrarse</span>
       </div>
+      <input type="hidden" id="errorRegistroFlag" th:if="${errorRegistro}" value="1" />
 
       <!-- Tipo de usuario -->
       <p style="font-size:0.83rem;font-weight:600;margin-bottom:10px;color:var(--texto-oscuro);">
@@ -97,7 +98,7 @@
 
       <form th:action="@{/usuarios/registro}" method="post" id="form-reg">
         <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-        <input type="hidden" id="tipo-usuario-input" name="tipo_usuario" value="CLIENTE"/>
+        <input type="hidden" id="tipo-usuario-input" name="rol" value="CLIENTE"/>
 
         <div class="form-group">
           <label for="nombre-reg">Nombre completo</label>
@@ -164,9 +165,12 @@
   // Si hay errorRegistro o param=registro en URL, abrir tab registro
   (function() {
     const params = new URLSearchParams(window.location.search);
-    const tieneErrorReg = document.querySelector('[th\\:if="${errorRegistro}"]');
-    if (params.get('tab') === 'registro') showTab('registro');
-    else showTab('login');
+    const tieneErrorReg = document.getElementById('errorRegistroFlag');
+    if (params.get('tab') === 'registro' || tieneErrorReg) {
+      showTab('registro');
+    } else {
+      showTab('login');
+    }
   })();
 
   function showTab(tab) {

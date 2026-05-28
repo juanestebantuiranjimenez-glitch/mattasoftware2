@@ -22,8 +22,8 @@
         <span class="cart-badge" th:text="${itemsCarrito?.size() ?: 0}">0</span>
       </a>
       <th:block th:if="${session.usuario != null}">
-        <a th:href="@{/dashboard}" class="nav-link">Mi Panel</a>
-        <a th:href="@{/logout}" class="nav-btn">Salir</a>
+        <a th:href="@{/usuarios/dashboard}" class="nav-link">Mi Panel</a>
+        <a th:href="@{/usuarios/logout}" class="nav-btn">Salir</a>
       </th:block>
     </nav>
   </div>
@@ -71,47 +71,46 @@
 
     <!-- Items -->
     <div th:each="item : ${itemsCarrito}" class="carrito-item"
-         th:id="'item-' + ${item.producto?.id}">
+         th:id="'item-' + ${item.productoId}">
 
       <div class="carrito-item-img">
-        <img th:if="${item.producto?.imagen != null}"
-             th:src="@{'/uploads/' + ${item.producto.imagen}}"
-             th:alt="${item.producto.nombre}"/>
-        <span th:unless="${item.producto?.imagen != null}"
-              th:text="${item.producto?.icono ?: '🥬'}">🥬</span>
+        <img th:if="${item.imagen != null}"
+             th:src="@{'/uploads/' + ${item.imagen}}"
+             th:alt="${item.nombre}"/>
+        <span th:unless="${item.imagen != null}">🥬</span>
       </div>
 
       <div class="carrito-item-info">
-        <div class="carrito-item-nombre" th:text="${item.producto?.nombre}">Producto</div>
+        <div class="carrito-item-nombre" th:text="${item.nombre}">Producto</div>
         <div class="carrito-item-vendedor">
-          👨‍🌾 <span th:text="${item.producto?.usuario?.nombre ?: 'Campesino'}">Campesino</span>
-          · $<span th:text="${#numbers.formatDecimal(item.producto?.precio ?: 0,0,'COMMA',0,'POINT')}">0</span>
-          / <span th:text="${item.producto?.unidad ?: 'kg'}">kg</span>
+          👨‍🌾 <span th:text="${item.vendedor ?: 'Campesino'}">Campesino</span>
+          · $<span th:text="${#numbers.formatDecimal(item.precio,0,'COMMA',0,'POINT')}">0</span>
+          / <span th:text="${item.unidad ?: 'kg'}">kg</span>
         </div>
 
         <!-- Cantidad -->
         <div class="qty-control">
           <button class="qty-btn"
-                  th:onclick="'cambiarCantidad(' + ${item.producto?.id} + ', -1)'"
+                  th:onclick="'cambiarCantidad(' + ${item.productoId} + ', -1)'"
                   title="Quitar uno">−</button>
           <span class="qty-num"
-                th:id="'qty-' + ${item.producto?.id}"
+                th:id="'qty-' + ${item.productoId}"
                 th:text="${item.cantidad}">1</span>
           <button class="qty-btn"
-                  th:onclick="'cambiarCantidad(' + ${item.producto?.id} + ', 1)'"
+                  th:onclick="'cambiarCantidad(' + ${item.productoId} + ', 1)'"
                   title="Agregar uno">+</button>
         </div>
       </div>
 
       <!-- Precio línea -->
       <div class="carrito-item-precio"
-           th:id="'precio-' + ${item.producto?.id}">
-        $<span th:text="${#numbers.formatDecimal((item.producto?.precio ?: 0) * item.cantidad, 0,'COMMA',0,'POINT')}">0</span>
+           th:id="'precio-' + ${item.productoId}">
+        $<span th:text="${#numbers.formatDecimal((item.precio) * item.cantidad, 0,'COMMA',0,'POINT')}">0</span>
       </div>
 
       <!-- Eliminar -->
       <button class="btn-eliminar"
-              th:onclick="'eliminarItem(' + ${item.producto?.id} + ')'"
+              th:onclick="'eliminarItem(' + ${item.productoId} + ')'
               title="Eliminar del carrito">✕</button>
 
     </div>

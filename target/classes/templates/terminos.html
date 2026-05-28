@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Términos y Condiciones — MATTA</title>
+  <link rel="stylesheet" th:href="@{/css/matta.css}"/>
+  <style>
+    .terminos-wrapper {
+      max-width: 860px;
+      margin: 48px auto;
+      padding: 0 24px 80px;
+    }
+    .terminos-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .terminos-header .icon { font-size: 3.5rem; margin-bottom: 16px; }
+    .terminos-header h1 {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--verde-oscuro, #1a3a2a);
+      margin-bottom: 10px;
+    }
+    .terminos-header p {
+      color: var(--texto-gris, #6b7280);
+      font-size: 0.9rem;
+    }
+    .terminos-section {
+      background: white;
+      border: 1.5px solid var(--borde, #e5e7eb);
+      border-radius: 14px;
+      padding: 28px 32px;
+      margin-bottom: 20px;
+    }
+    .terminos-section h2 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--verde-oscuro, #1a3a2a);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .terminos-section p, .terminos-section li {
+      color: var(--texto-oscuro, #1f2937);
+      font-size: 0.9rem;
+      line-height: 1.75;
+      margin-bottom: 8px;
+    }
+    .terminos-section ul {
+      padding-left: 20px;
+    }
+    .terminos-back {
+      display: flex;
+      justify-content: center;
+      margin-top: 36px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a th:href="@{/}" class="navbar-logo">🌿 MATTA</a>
+    <div style="flex:1;"></div>
+    <nav class="navbar-nav">
+      <a th:href="@{/productos/listar}" class="nav-link">Productos</a>
+      <a th:href="@{/campesinos}" class="nav-link">Campesinos</a>
+      <th:block th:if="${session.usuario != null}">
+        <a th:href="@{/usuarios/dashboard}" class="nav-link">Mi Panel</a>
+        <a th:href="@{/usuarios/logout}" class="nav-btn">Salir</a>
+      </th:block>
+      <th:block th:unless="${session.usuario != null}">
+        <a th:href="@{/usuarios/login}" class="nav-link">Ingresar</a>
+        <a th:href="@{/usuarios/registro}" class="nav-btn">Registrarse</a>
+      </th:block>
+    </nav>
+  </div>
+</nav>
+
+<div class="terminos-wrapper">
+
+  <div class="terminos-header">
+    <div class="icon">📋</div>
+    <h1>Términos y Condiciones</h1>
+    <p>Última actualización: mayo de 2025 · Válido para usuarios en Colombia</p>
+  </div>
+
+  <div class="terminos-section">
+    <h2>1. 🌿 Aceptación de los términos</h2>
+    <p>Al registrarte y usar MATTA, aceptas estos Términos y Condiciones en su totalidad. Si no estás de acuerdo con alguno de los puntos, te pedimos que no uses nuestra plataforma.</p>
+    <p>MATTA es una plataforma digital que conecta a campesinos productores de alimentos frescos con clientes finales y restaurantes en Colombia.</p>
+  </div>
+
+  <div class="terminos-section">
+    <h2>2. 👤 Registro y cuenta de usuario</h2>
+    <ul>
+      <li>Debes tener al menos 18 años para registrarte en MATTA.</li>
+      <li>La información que proporciones debe ser veraz, completa y actualizada.</li>
+      <li>Eres responsable de mantener la confidencialidad de tu contraseña.</li>
+      <li>Cada persona puede tener una única cuenta activa en la plataforma.</li>
+      <li>MATTA se reserva el derecho de suspender cuentas que incumplan estos términos.</li>
+    </ul>
+  </div>
+
+  <div class="terminos-section">
+    <h2>3. 👨‍🌾 Campesinos / Vendedores</h2>
+    <ul>
+      <li>Los campesinos son responsables de la veracidad de la información de sus productos (nombre, descripción, precio, cantidad disponible e imágenes).</li>
+      <li>Solo se permite publicar productos agrícolas o alimenticios de producción propia o local.</li>
+      <li>MATTA puede remover productos que no cumplan con los estándares de calidad o que contengan información falsa.</li>
+      <li>El campesino acepta que el stock se descuente automáticamente al concretarse una compra.</li>
+    </ul>
+  </div>
+
+  <div class="terminos-section">
+    <h2>4. 🛒 Compradores / Clientes</h2>
+    <ul>
+      <li>Los clientes son responsables de revisar las características del producto antes de realizar la compra.</li>
+      <li>Una vez procesada la compra, el stock se descuenta en tiempo real.</li>
+      <li>MATTA no garantiza la disponibilidad permanente de ningún producto.</li>
+      <li>Las compras están sujetas a la disponibilidad de stock en el momento de la transacción.</li>
+    </ul>
+  </div>
+
+  <div class="terminos-section">
+    <h2>5. 💳 Pagos y precios</h2>
+    <ul>
+      <li>Todos los precios están expresados en pesos colombianos (COP) e incluyen impuestos cuando aplica.</li>
+      <li>MATTA puede ofrecer cupones de descuento con condiciones específicas de uso.</li>
+      <li>Los precios pueden variar según la temporada y disponibilidad de cada campesino.</li>
+      <li>Los pagos se procesan de forma segura a través de nuestra plataforma.</li>
+    </ul>
+  </div>
+
+  <div class="terminos-section">
+    <h2>6. 🚚 Entregas</h2>
+    <ul>
+      <li>Los tiempos y condiciones de entrega dependen del campesino vendedor y la ubicación del comprador.</li>
+      <li>MATTA actúa como intermediario y no es directamente responsable por los tiempos de entrega.</li>
+      <li>En caso de problemas con la entrega, el cliente debe comunicarse con el soporte de MATTA.</li>
+    </ul>
+  </div>
+
+  <div class="terminos-section">
+    <h2>7. 🔒 Privacidad y datos personales</h2>
+    <p>MATTA recopila y usa datos personales de acuerdo con la Ley 1581 de 2012 (Habeas Data) de Colombia. Al registrarte, autorizas el tratamiento de tus datos para:</p>
+    <ul>
+      <li>Gestionar tu cuenta y transacciones.</li>
+      <li>Mejorar los servicios de la plataforma.</li>
+      <li>Enviarte comunicaciones relacionadas con tus compras o ventas.</li>
+    </ul>
+    <p>Nunca venderemos ni compartiremos tus datos con terceros no autorizados.</p>
+  </div>
+
+  <div class="terminos-section">
+    <h2>8. ⚠️ Limitación de responsabilidad</h2>
+    <p>MATTA no se hace responsable por:</p>
+    <ul>
+      <li>Pérdidas derivadas del uso indebido de la plataforma.</li>
+      <li>Problemas ocasionados por terceros (proveedores de pago, transportistas).</li>
+      <li>Interrupciones del servicio por causas de fuerza mayor.</li>
+      <li>La calidad final de los productos, la cual recae sobre el campesino productor.</li>
+    </ul>
+  </div>
+
+  <div class="terminos-section">
+    <h2>9. 📝 Modificaciones a los términos</h2>
+    <p>MATTA puede actualizar estos Términos y Condiciones en cualquier momento. Te notificaremos por correo electrónico ante cambios significativos. El uso continuado de la plataforma después de dichos cambios constituye tu aceptación de los nuevos términos.</p>
+  </div>
+
+  <div class="terminos-section">
+    <h2>10. 📬 Contacto</h2>
+    <p>Si tienes preguntas sobre estos términos, escríbenos a través de nuestra sección de <a th:href="@{/contacto}" style="color:var(--verde-suave,#4a8c5c);font-weight:600;">Contacto</a> o al correo <strong>hola@matta.com.co</strong>.</p>
+  </div>
+
+  <div class="terminos-back">
+    <a th:href="@{/}" class="btn-primary" style="display:inline-flex;justify-content:center;width:auto;padding:12px 28px;">
+      ← Volver al inicio
+    </a>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer" style="margin-top:0;">
+  <div class="footer-bottom" style="max-width:1280px;margin:0 auto;padding:20px 24px;">
+    <p>© 2025 <span>MATTA</span> — Lo natural es lo real</p>
+    <p>Hecho con 💚 en Colombia</p>
+  </div>
+</footer>
+
+</body>
+</html>
