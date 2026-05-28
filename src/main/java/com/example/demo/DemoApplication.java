@@ -18,12 +18,11 @@ public class DemoApplication {
 	public CommandLineRunner testRepository(UsuarioRepository repo) {
 		return args -> {
 			System.out.println("--- PROBANDO CONEXIÓN Y REPOSITORY ---");
-			
-			
+
 			repo.findAll().forEach(user -> {
 				System.out.println("Usuario encontrado: " + user.getNombre() + " (" + user.getCorreo() + ")");
 			});
-			
+
 			System.out.println("--- PRUEBA TERMINADA CON ÉXITO ---");
 		};
 	}

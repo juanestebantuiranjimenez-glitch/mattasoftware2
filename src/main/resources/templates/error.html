@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error - MATTA</title>
+    <link rel="stylesheet" th:href="@{/css/matta.css}"/>
+</head>
+<body style="display:flex;align-items:center;justify-content:center;height:100vh;background-color:var(--crema);">
+    <div style="text-align:center;background:white;padding:40px;border-radius:var(--radio);border:1px solid var(--borde);max-width:500px;">
+        <div style="font-size:4rem;margin-bottom:20px;">⚠️</div>
+        <h1 style="color:var(--verde-oscuro);font-size:1.5rem;margin-bottom:10px;">¡Ups! Algo salió mal.</h1>
+        <p style="color:var(--texto-gris);font-size:0.95rem;margin-bottom:20px;">
+            Parece que ha ocurrido un error inesperado en nuestro sistema.
+        </p>
+        <div th:if="${errorMsg}" style="background:#fee2e2;color:#b91c1c;padding:10px;border-radius:4px;font-size:0.85rem;margin-bottom:20px;text-align:left;word-break:break-all;">
+            <strong th:text="${errorMsg}"></strong>
+        </div>
+        <a th:href="@{/}" class="btn-primary" style="display:inline-block;text-decoration:none;">Volver al inicio</a>
+    </div>
+</body>
+</html>

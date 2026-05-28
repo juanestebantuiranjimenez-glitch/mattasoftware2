@@ -39,6 +39,37 @@ public class UsuarioServices {
         return null; // Si algo falla, devolvemos nada
     }
     public boolean existeCorreo(String correo) {
-    return usuarioRepository.findByCorreo(correo).isPresent();
-}
+        return usuarioRepository.findByCorreo(correo).isPresent();
+    }
+
+    public boolean actualizarPassword(String correo, String nuevaPassword) {
+        Optional<Usuarios> usuarioOpcional = usuarioRepository.findByCorreo(correo);
+        if (usuarioOpcional.isPresent()) {
+            Usuarios usuario = usuarioOpcional.get();
+            usuario.setContrasena(nuevaPassword);
+            usuarioRepository.save(usuario);
+            return true;
+        }
+        return false;
+    }
+
+    public Usuarios actualizarPerfil(Integer id, String nombre, String telefono, String ubicacion, String passwordActual, String nuevaPassword) throws Exception {
+        Optional<Usuarios> usuarioOpcional = usuarioRepository.findById(id);
+        if (usuarioOpcional.isPresent()) {
+            Usuarios usuario = usuarioOpcional.get();
+            usuario.setNombre(nombre);
+            usuario.setTelefono(telefono);
+            if (ubicacion != null) {
+                usuario.setUbicacion(ubicacion);
+            }
+            if (nuevaPassword != null && !nuevaPassword.isEmpty()) {
+                if (!usuario.getContrasena().equals(passwordActual)) {
+                    throw new Exception("La contraseña actual es incorrecta.");
+                }
+                usuario.setContrasena(nuevaPassword);
+            }
+            return usuarioRepository.save(usuario);
+        }
+        throw new Exception("Usuario no encontrado.");
+    }
 }

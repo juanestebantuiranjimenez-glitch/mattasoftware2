@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Aprende a usar MATTA</title>
+    <link rel="stylesheet" th:href="@{/css/matta.css}"/>
+    <style>
+        .cursos-header {
+            background: linear-gradient(135deg, var(--verde-oscuro) 0%, var(--verde-medio) 100%);
+            color: white;
+            text-align: center;
+            padding: 60px 24px;
+        }
+        .cursos-header h1 {
+            color: var(--verde-lima);
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        .cursos-header p {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            color: rgba(245,240,220,0.9);
+        }
+        .cursos-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+        .curso-tabs {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 40px;
+            justify-content: center;
+        }
+        .curso-tab {
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: var(--radio-pill);
+            border: 2px solid var(--verde-suave);
+            background: white;
+            color: var(--verde-oscuro);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .curso-tab.active {
+            background: var(--verde-oscuro);
+            color: var(--verde-lima);
+            border-color: var(--verde-oscuro);
+        }
+        .curso-content {
+            display: none;
+        }
+        .curso-content.active {
+            display: block;
+        }
+        .paso-card {
+            background: white;
+            border-radius: var(--radio);
+            border: 1.5px solid var(--borde);
+            padding: 30px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .paso-numero {
+            background: var(--verde-lima);
+            color: var(--verde-oscuro);
+            font-size: 2rem;
+            font-weight: 900;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .paso-texto h3 {
+            font-size: 1.5rem;
+            color: var(--verde-oscuro);
+            margin-bottom: 12px;
+        }
+        .paso-texto p {
+            font-size: 1.05rem;
+            color: var(--texto-gris);
+            line-height: 1.6;
+        }
+        @media (max-width: 600px) {
+            .paso-card {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="cursos-header">
+    <h1>Aprende a usar MATTA</h1>
+    <p>Hemos diseñado guías muy sencillas paso a paso para que puedas comprar o vender tus productos sin complicaciones.</p>
+</div>
+
+<div class="cursos-container">
+    <div class="curso-tabs">
+        <button class="curso-tab active" onclick="mostrarCurso('consumidor')">🛒 Quiero Comprar</button>
+        <button class="curso-tab" onclick="mostrarCurso('campesino')">👨‍🌾 Quiero Vender</button>
+    </div>
+
+    <!-- Guía Consumidor -->
+    <div id="curso-consumidor" class="curso-content active">
+        <div class="paso-card">
+            <div class="paso-numero">1</div>
+            <div class="paso-texto">
+                <h3>Regístrate en la plataforma</h3>
+                <p>Haz clic en el botón <strong>"Registrarse"</strong> en la parte superior. Llena tus datos básicos (nombre, correo y contraseña) y selecciona que eres "Consumidor". ¡Es totalmente gratis!</p>
+            </div>
+        </div>
+        <div class="paso-card">
+            <div class="paso-numero">2</div>
+            <div class="paso-texto">
+                <h3>Busca los productos que necesitas</h3>
+                <p>Usa la barra de búsqueda en la parte superior o explora las categorías como Frutas, Verduras o Café. Verás los productos frescos directamente de la finca.</p>
+            </div>
+        </div>
+        <div class="paso-card">
+            <div class="paso-numero">3</div>
+            <div class="paso-texto">
+                <h3>Agrega al carrito</h3>
+                <p>Cuando encuentres lo que te gusta, presiona el botón con el símbolo <strong>"+"</strong> o que dice <strong>"Agregar al carrito"</strong>. Puedes pedir la cantidad que desees.</p>
+            </div>
+        </div>
+        <div class="paso-card">
+            <div class="paso-numero">4</div>
+            <div class="paso-texto">
+                <h3>Finaliza tu compra</h3>
+                <p>Ve a tu carrito (el ícono de la canasta arriba), revisa tus productos y presiona <strong>"Proceder al Pago"</strong>. Ingresa tu dirección y listo. ¡Tu pedido llegará pronto a tu casa!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guía Campesino -->
+    <div id="curso-campesino" class="curso-content">
+        <div class="paso-card">
+            <div class="paso-numero">1</div>
+            <div class="paso-texto">
+                <h3>Crea tu cuenta de Vendedor</h3>
+                <p>Haz clic en <strong>"Registrarse"</strong>, llena tu información personal y asegúrate de elegir la opción <strong>"Campesino / Vendedor"</strong>. Esto te permitirá crear tu propia tienda en línea.</p>
+            </div>
+        </div>
+        <div class="paso-card">
+            <div class="paso-numero">2</div>
+            <div class="paso-texto">
+                <h3>Entra a tu Panel de Control</h3>
+                <p>Inicia sesión con tu correo y contraseña. Arriba a la derecha verás un botón que dice <strong>"Mi Panel"</strong>. Al hacer clic allí, entrarás a tu espacio de trabajo.</p>
+            </div>
+        </div>
+        <div class="paso-card">
+            <div class="paso-numero">3</div>
+            <div class="paso-texto">
+                <h3>Publica tu primer producto</h3>
+                <p>En tu panel, ve a la sección <strong>"Mis Productos"</strong> y presiona <strong>"Nuevo Producto"</strong>. Escribe el nombre (ej. Tomate Chonto), el precio, la categoría y sube una foto bonita de tu producto. Presiona Guardar.</p>
+            </div>
+        </div>
+        <div class="paso-card">
+            <div class="paso-numero">4</div>
+            <div class="paso-texto">
+                <h3>Revisa tus ventas y entregas</h3>
+                <p>Cuando alguien te compre, lo verás en la pestaña <strong>"Mis Ventas"</strong> o <strong>"Logística"</strong> de tu panel. Allí podrás ver qué debes enviar, a qué dirección y confirmar cuando ya lo hayas entregado.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script>
+    function mostrarCurso(tipo) {
+        document.querySelectorAll('.curso-tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.curso-content').forEach(content => content.classList.remove('active'));
+        
+        if (tipo === 'consumidor') {
+            document.querySelectorAll('.curso-tab')[0].classList.add('active');
+            document.getElementById('curso-consumidor').classList.add('active');
+        } else {
+            document.querySelectorAll('.curso-tab')[1].classList.add('active');
+            document.getElementById('curso-campesino').classList.add('active');
+        }
+    }
+</script>
+
+</body>
+</html>

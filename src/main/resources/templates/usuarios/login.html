@@ -41,7 +41,7 @@
         ✅ <span th:text="${mensajeExito}">¡Registro exitoso!</span>
       </div>
 
-      <form th:action="@{/login}" method="post">
+      <form th:action="@{/usuarios/login}" method="post">
         <!-- CSRF Token de Spring Security (si lo usas) -->
         <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
@@ -53,12 +53,12 @@
 
         <div class="form-group">
           <label for="password-login">Contraseña</label>
-          <input type="password" id="password-login" name="password"
+          <input type="password" id="password-login" name="contrasena"
                  placeholder="Tu contraseña" required autocomplete="current-password"/>
         </div>
 
         <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
-          <a th:href="@{/recuperar-clave}"
+          <a th:href="@{/usuarios/recuperar-password}"
              style="font-size:0.82rem;color:var(--verde-suave);font-weight:500;">
             ¿Olvidaste tu contraseña?
           </a>
@@ -81,6 +81,7 @@
            style="background:#fee2e2;color:#b91c1c;border-radius:8px;padding:10px 14px;font-size:0.85rem;margin-bottom:16px;">
         ⚠️ <span th:text="${errorRegistro}">Error al registrarse</span>
       </div>
+      <input type="hidden" id="errorRegistroFlag" th:if="${errorRegistro}" value="1" />
 
       <!-- Tipo de usuario -->
       <p style="font-size:0.83rem;font-weight:600;margin-bottom:10px;color:var(--texto-oscuro);">
@@ -95,9 +96,9 @@
         </div>
       </div>
 
-      <form th:action="@{/registro}" method="post" id="form-reg">
+      <form th:action="@{/usuarios/registro}" method="post" id="form-reg">
         <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-        <input type="hidden" id="tipo-usuario-input" name="tipo" value="CLIENTE"/>
+        <input type="hidden" id="tipo-usuario-input" name="rol" value="CLIENTE"/>
 
         <div class="form-group">
           <label for="nombre-reg">Nombre completo</label>
@@ -128,7 +129,7 @@
 
         <div class="form-group">
           <label for="password-reg">Contraseña</label>
-          <input type="password" id="password-reg" name="password"
+          <input type="password" id="password-reg" name="contrasena"
                  placeholder="Mínimo 6 caracteres" required
                  minlength="6" autocomplete="new-password"/>
         </div>
@@ -164,9 +165,12 @@
   // Si hay errorRegistro o param=registro en URL, abrir tab registro
   (function() {
     const params = new URLSearchParams(window.location.search);
-    const tieneErrorReg = document.querySelector('[th\\:if="${errorRegistro}"]');
-    if (params.get('tab') === 'registro') showTab('registro');
-    else showTab('login');
+    const tieneErrorReg = document.getElementById('errorRegistroFlag');
+    if (params.get('tab') === 'registro' || tieneErrorReg) {
+      showTab('registro');
+    } else {
+      showTab('login');
+    }
   })();
 
   function showTab(tab) {

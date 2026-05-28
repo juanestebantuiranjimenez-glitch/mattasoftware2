@@ -16,11 +16,9 @@
     </div>
 
     <!-- LINKS escritorio -->
-    <nav class="matta-nav-links">
-      <a th:href="@{/productos/listar}" class="matta-nav-link">Productos</a>
-
       <!-- Si está logueado -->
       <th:block th:if="${session.usuario != null}">
+        <a th:href="@{/productos/listar}" class="matta-nav-link">Productos</a>
         <a th:href="@{/usuarios/dashboard}" class="matta-nav-link">Mi Panel</a>
         <a th:href="@{/usuarios/logout}"    class="matta-nav-btn-out">Salir</a>
       </th:block>
@@ -30,7 +28,6 @@
         <a th:href="@{/usuarios/login}"    class="matta-nav-link">Ingresar</a>
         <a th:href="@{/usuarios/registro}" class="matta-nav-btn">Registrarse</a>
       </th:block>
-    </nav>
 
     <!-- Botón hamburguesa móvil -->
     <button class="matta-hamburger" onclick="toggleMobileMenu()" aria-label="Menú">☰</button>
@@ -38,8 +35,8 @@
 
   <!-- Menú móvil -->
   <div class="matta-mobile-menu" id="mobileMenu">
-    <a th:href="@{/productos/listar}">🥦 Productos</a>
     <th:block th:if="${session.usuario != null}">
+      <a th:href="@{/productos/listar}">🥦 Productos</a>
       <a th:href="@{/usuarios/dashboard}">📊 Mi panel</a>
       <a th:href="@{/usuarios/logout}">🚪 Salir</a>
     </th:block>

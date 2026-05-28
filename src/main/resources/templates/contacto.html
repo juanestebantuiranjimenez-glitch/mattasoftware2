@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Contacto - MATTA</title>
+    <link rel="stylesheet" th:href="@{/css/matta.css}"/>
+    <style>
+        .contacto-header {
+            background: linear-gradient(135deg, var(--verde-oscuro) 0%, var(--verde-medio) 100%);
+            color: white;
+            text-align: center;
+            padding: 60px 24px;
+        }
+        .contacto-header h1 {
+            color: var(--verde-lima);
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+        .contacto-header p {
+            font-size: 1.1rem;
+            color: rgba(245,240,220,0.9);
+        }
+        .contacto-container {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        .info-contacto {
+            background: white;
+            padding: 40px;
+            border-radius: var(--radio);
+            border: 1.5px solid var(--borde);
+            height: fit-content;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .info-icono {
+            background: rgba(200,224,58,0.2);
+            color: var(--verde-oscuro);
+            font-size: 1.5rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .info-texto h3 {
+            font-size: 1.1rem;
+            color: var(--verde-oscuro);
+            margin-bottom: 4px;
+        }
+        .info-texto p {
+            color: var(--texto-gris);
+            font-size: 0.95rem;
+        }
+        .formulario-contacto {
+            background: white;
+            padding: 40px;
+            border-radius: var(--radio);
+            border: 1.5px solid var(--borde);
+            box-shadow: var(--sombra);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--texto-oscuro);
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid var(--borde);
+            border-radius: var(--radio-sm);
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: var(--verde-lima);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(200,224,58,0.2);
+        }
+        .btn-enviar {
+            background: var(--verde-lima);
+            color: var(--verde-oscuro);
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: var(--radio-sm);
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-enviar:hover {
+            background: #ddf04a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(200,224,58,0.3);
+        }
+        @media (max-width: 768px) {
+            .contacto-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="contacto-header">
+    <h1>Contáctanos</h1>
+    <p>Estamos aquí para ayudarte. Si tienes dudas, sugerencias o necesitas soporte, escríbenos.</p>
+</div>
+
+<div class="contacto-container">
+    <div class="info-contacto">
+        <h2>Nuestra Información</h2>
+        <p style="color:var(--texto-gris); margin-bottom: 30px;">Puedes comunicarte con nosotros a través de los siguientes canales:</p>
+        
+        <div class="info-item">
+            <div class="info-icono">📍</div>
+            <div class="info-texto">
+                <h3>Ubicación</h3>
+                <p>Pereira, Risaralda - Colombia</p>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-icono">📞</div>
+            <div class="info-texto">
+                <h3>Teléfono / WhatsApp</h3>
+                <p>+57 300 123 4567</p>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-icono">✉️</div>
+            <div class="info-texto">
+                <h3>Correo Electrónico</h3>
+                <p>soporte@matta.com.co</p>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-icono">⏰</div>
+            <div class="info-texto">
+                <h3>Horario de Atención</h3>
+                <p>Lunes a Sábado: 8:00 AM - 6:00 PM</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="formulario-contacto">
+        <h2 style="margin-bottom: 24px; color: var(--verde-oscuro);">Envíanos un mensaje</h2>
+        <form onsubmit="event.preventDefault(); alert('¡Gracias por contactarnos! Tu mensaje ha sido enviado exitosamente y te responderemos pronto.'); this.reset();">
+            <div class="form-group">
+                <label for="nombre">Nombre Completo</label>
+                <input type="text" id="nombre" required placeholder="Ej. María Pérez">
+            </div>
+            <div class="form-group">
+                <label for="correo">Correo Electrónico</label>
+                <input type="email" id="correo" required placeholder="ejemplo@correo.com">
+            </div>
+            <div class="form-group">
+                <label for="asunto">Asunto</label>
+                <input type="text" id="asunto" required placeholder="¿En qué podemos ayudarte?">
+            </div>
+            <div class="form-group">
+                <label for="mensaje">Mensaje</label>
+                <textarea id="mensaje" rows="5" required placeholder="Escribe tu mensaje aquí..."></textarea>
+            </div>
+            <button type="submit" class="btn-enviar">Enviar Mensaje</button>
+        </form>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

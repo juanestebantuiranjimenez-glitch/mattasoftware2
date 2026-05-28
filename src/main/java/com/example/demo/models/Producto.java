@@ -4,11 +4,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.io.Serializable;
 
 @Entity
-@Table(name = "PRODUCTO")
-public class Producto {
+@Table(name = "producto")
+public class Producto implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +22,10 @@ public class Producto {
     private double precio; 
     private int cantidad_disponible;
     private String imagen;
-    private int id_usuario; 
+    
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
+    private Usuarios usuario; 
 
     public Producto() {
     }
@@ -59,21 +66,21 @@ public class Producto {
     public void setImagen(String imagen) {
         this.imagen = imagen;
     }
-    public int getId_usuario() {
-        return id_usuario;
+    public Usuarios getUsuario() {
+        return usuario;
     }
-    public void setId_usuario(int id_usuario) {
-        this.id_usuario = id_usuario;
+    public void setUsuario(Usuarios usuario) {
+        this.usuario = usuario;
     }
     public Producto(int id_producto, String nombre, String descripcion, double precio, int cantidad_disponible,
-            String imagen, int id_usuario) {
+            String imagen, Usuarios usuario) {
         this.id_producto = id_producto;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
         this.cantidad_disponible = cantidad_disponible;
         this.imagen = imagen;
-        this.id_usuario = id_usuario;
+        this.usuario = usuario;
     }
 
 }
